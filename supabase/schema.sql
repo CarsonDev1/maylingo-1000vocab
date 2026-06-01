@@ -19,10 +19,14 @@ end; $$;
 -- ============================================================
 create table if not exists public.courses (
   id          integer primary key,
+  slug        text unique,          -- stable name, e.g. '1000vocab', 'prepvocab'
   title_vi    text not null,
   title_en    text,
   created_at  timestamptz not null default now()
 );
+-- for DBs created before `slug` existed:
+alter table public.courses add column if not exists slug text;
+create unique index if not exists courses_slug_key on public.courses(slug);
 
 create table if not exists public.lessons (
   id          integer primary key,

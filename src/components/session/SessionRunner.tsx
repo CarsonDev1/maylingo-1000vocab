@@ -68,7 +68,7 @@ export function SessionRunner({
     const acc = graded ? Math.round((correct / graded) * 100) : 100;
     return (
       <Overlay center>
-        <div className="mx-auto max-w-xl px-6 text-center">
+        <div className="mx-auto w-full max-w-xl px-6 text-center">
           <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
             <Image src="/finish.svg" width={100} height={100} alt="Hoàn thành" className="mx-auto" />
             <h2 className="mt-4 text-2xl font-bold text-white">Hoàn thành!</h2>
