@@ -273,7 +273,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
   return (
     <Card index={index} total={total} title={PROMPT[type]}>
       <div className="space-y-6">
-        <div className="rounded-xl border-2 bg-slate-50 p-6">{promptHeader}</div>
+        <div className="rounded-xl border-2 bg-slate-50 p-6 text-neutral-800">{promptHeader}</div>
 
         {isSpell ? (
           <SpellInput term={word.term} disabled={result !== null} onCheck={(c) => grade(c)} />
@@ -319,7 +319,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
                   )}
                 >
                   {opt.image ? (
-                    <Image src={opt.image} alt={opt.label} width={200} height={160} className="h-32 w-full object-cover" unoptimized />
+                    <Image src={opt.image} alt={opt.label} width={200} height={160} className="h-32 w-full object-contain" unoptimized />
                   ) : (
                     <div className="flex h-32 items-center justify-center text-sm">{opt.label}</div>
                   )}
@@ -457,7 +457,7 @@ function SpellInput({
               autoCapitalize="off"
               autoComplete="off"
               spellCheck={false}
-              onChange={() => {}}
+              onChange={() => { }}
               onKeyDown={(e) => onKeyDown(i, e)}
               className={cn(
                 "h-12 w-8 border-b-[3px] bg-transparent text-center text-2xl font-bold lowercase outline-none transition-colors",
