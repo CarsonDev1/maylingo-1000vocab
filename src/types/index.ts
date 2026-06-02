@@ -89,7 +89,7 @@ export type ExerciseType =
   | "listen_choose" // audio -> pick word/meaning
   | "listen_write" // audio -> type word
   | "underlined_meaning" // sentence w/ underlined word -> pick meaning
-  | "spell"; // VI meaning -> spell/type the EN word ("Điền từ")
+  | "spell"; // VI meaning -> spell/type the EN word
 
 export interface ExerciseOption {
   /** display text (word or meaning or phonetic) */

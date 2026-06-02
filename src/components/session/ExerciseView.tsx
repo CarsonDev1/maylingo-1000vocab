@@ -364,7 +364,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
   );
 }
 
-/** "Điền từ": type directly into the missing letter slots (MochiDemy-style). */
+/** Spell-the-word: type directly into the missing letter slots (MochiDemy-style). */
 function SpellInput({
   term,
   disabled,
@@ -375,10 +375,13 @@ function SpellInput({
   onCheck: (correct: boolean) => void;
 }) {
   const chars = useMemo(() => term.split(""), [term]);
-  const isHint = (i: number) => chars[i] !== " " && i % 3 === 0;
-  const editable = (i: number) => chars[i] !== " " && !isHint(i);
+  // Only letters are typeable slots; everything else (space, hyphen, apostrophe,
+  // dot, digits…) is a fixed separator that's shown as-is and never edited.
+  const isLetter = (c: string) => /^[a-zA-Z]$/.test(c);
+  const isHint = (i: number) => isLetter(chars[i]) && i % 3 === 0;
+  const editable = (i: number) => isLetter(chars[i]) && !isHint(i);
   const [vals, setVals] = useState<string[]>(() =>
-    chars.map((c, i) => (c === " " ? " " : isHint(i) ? c.toLowerCase() : "")),
+    chars.map((c, i) => (!isLetter(c) ? c : isHint(i) ? c.toLowerCase() : "")),
   );
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -391,7 +394,7 @@ function SpellInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const complete = chars.every((c, i) => c === " " || vals[i] !== "");
+  const complete = chars.every((c, i) => !isLetter(c) || vals[i] !== "");
 
   function setAt(i: number, v: string) {
     setVals((prev) => {
@@ -402,7 +405,7 @@ function SpellInput({
   }
   function check() {
     const assembled = chars
-      .map((c, i) => (c === " " ? " " : vals[i]))
+      .map((c, i) => (!isLetter(c) ? c : vals[i]))
       .join("")
       .trim()
       .toLowerCase();
@@ -443,8 +446,14 @@ function SpellInput({
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-center gap-x-1.5 gap-y-3">
         {chars.map((c, i) =>
-          c === " " ? (
-            <span key={i} className="w-3" />
+          !isLetter(c) ? (
+            c === " " ? (
+              <span key={i} className="w-3" />
+            ) : (
+              <span key={i} className="self-end pb-1.5 text-2xl font-bold text-neutral-500">
+                {c}
+              </span>
+            )
           ) : (
             <input
               key={i}
@@ -470,13 +479,13 @@ function SpellInput({
         )}
       </div>
       <Button variant="primary" className="w-full" disabled={!complete || disabled} onClick={check}>
-        Kiểm tra
+        Check
       </Button>
     </div>
   );
 }
 
-/** MochiDemy-style result drawer (shadcn): slides up showing the word + Tiếp tục. */
+/** MochiDemy-style result drawer (shadcn): slides up showing the word + Continue. */
 function ResultDrawer({
   open,
   correct,

@@ -26,7 +26,7 @@ export default async function NotebookPage() {
         <UserProgress stats={stats} />
       </StickyWrapper>
       <FeedWrapper>
-        <PageHeader title="Sổ tay" />
+        <PageHeader title="Notebook" />
         <NotebookClient words={words} />
       </FeedWrapper>
     </div>

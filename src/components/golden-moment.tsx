@@ -14,7 +14,7 @@ function fmt(ms: number) {
 }
 
 /**
- * "Thời điểm vàng" (golden moment) countdown. Shows time remaining until the
+ * "Golden Moment" countdown. Shows time remaining until the
  * next batch of words becomes due; once it hits 0, offers to review now.
  */
 export function GoldenMoment({ nextDueAt, prepCount }: { nextDueAt: string; prepCount: number }) {

@@ -1,5 +1,5 @@
 /**
- * Account badges (huy hiệu). Each badge is unlocked by reaching a milestone in
+ * Account badges. Each badge is unlocked by reaching a milestone in
  * one of several dimensions: level, total XP, words learned, words mastered, or
  * streak. Badges are pure functions of the user's current gamification stats so
  * they can be evaluated on the client without extra round-trips.

@@ -81,10 +81,10 @@ function pickTypeFor(word: Word, pool: Word[], allow: ExerciseType[]): ExerciseT
 }
 
 /**
- * Learn-new session — mirrors MochiDemy's "Học từ mới" flow. PER WORD, in order:
+ * Learn-new session — mirrors MochiDemy's "Learn new words" flow. PER WORD, in order:
  *   1. flashcard      — intro card (sentence + word + phonetic + meaning + audio)
- *   2. listen_write   — "Nghe và viết lại" (hear the word, type it)
- *   3. spell          — "Điền từ" (given the VI meaning, spell the EN word)
+ *   2. listen_write   — "Listen and write" (hear the word, type it)
+ *   3. spell          — "Spell the word" (given the VI meaning, spell the EN word)
  * then move on to the next word. No multiple-choice while learning new words —
  * those only appear during review. listen_write is skipped if the word has no audio.
  */

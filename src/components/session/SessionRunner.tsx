@@ -65,9 +65,9 @@ export function SessionRunner({
     playAudio("/finish.mp3");
     // Persist results in the background. We intentionally do NOT call
     // router.refresh() here: refreshing the current /review (or /lessons) route
-    // would swap the page to its empty state and yank away this "Hoàn thành!"
+    // would swap the page to its empty state and yank away this "Complete!"
     // screen mid-celebration. The result pages are dynamic and revalidated by the
-    // actions, so the "Về trang chủ" / "Ôn tiếp" links fetch fresh data on click.
+    // actions, so the "Back to home" / "Keep reviewing" links fetch fresh data on click.
     startTransition(async () => {
       if (mode === "learn") await learnWords(wordIds);
       else await finishReviewSession(finalReviewed, finalCorrect);

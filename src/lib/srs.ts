@@ -1,5 +1,5 @@
 /**
- * Spaced-repetition engine — MochiDemy "Thời điểm vàng" (golden moment) style.
+ * Spaced-repetition engine — MochiDemy "Golden Moment" style.
  *
  * The FIRST review lands ~1 hour after learning (the golden moment on the
  * forgetting curve), then widens (1h → 4h → 8h → 1d → 3d → 7d → 15d → 30d →

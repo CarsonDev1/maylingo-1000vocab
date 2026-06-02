@@ -16,7 +16,7 @@ const UserProgress = ({ stats }: Props) => {
 
       <Link
         href="/stats"
-        title="Tổng XP"
+        title="Total XP"
         className="flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 ring-1 ring-black/5 transition hover:brightness-95"
       >
         <Image src="/points.svg" height={22} width={22} alt="XP" />
@@ -25,7 +25,7 @@ const UserProgress = ({ stats }: Props) => {
 
       <Link
         href="/stats"
-        title="Chuỗi streak"
+        title="Streak"
         className="flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 ring-1 ring-black/5 transition hover:brightness-95"
       >
         <Flame className="h-[18px] w-[18px] fill-rose-500 text-rose-500" />

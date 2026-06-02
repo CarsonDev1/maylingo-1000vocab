@@ -27,7 +27,7 @@ export function ReviewClient({
     return { steps: buildReviewSteps(plain, pool, profByWord), ids: words.map((w) => w.id) };
   }, [words, pool]);
 
-  // The immersive full-screen session only starts after the user taps "Ôn tập ngay".
+  // The immersive full-screen session only starts after the user taps "Review now".
   if (started) {
     return <SessionRunner steps={steps} mode="review" wordIds={ids} xpBefore={xpBefore} />;
   }
