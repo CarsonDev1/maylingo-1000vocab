@@ -22,7 +22,7 @@ const Header = () => {
           <SignedOut>
             <SignInButton mode="modal" forceRedirectUrl="/dashboard" signUpForceRedirectUrl="/dashboard">
               <Button size="lg" variant="ghost">
-                Đăng nhập
+                Sign in
               </Button>
             </SignInButton>
           </SignedOut>

@@ -10,12 +10,12 @@ import type { WordWithProgress } from "@/types";
 import { Search, Volume2 } from "lucide-react";
 
 const LEVELS = [
-  { v: 0, label: "Tất cả" },
-  { v: 1, label: "Mới" },
-  { v: 2, label: "Đang nhớ" },
-  { v: 3, label: "Khá" },
-  { v: 4, label: "Tốt" },
-  { v: 5, label: "Thành thạo" },
+  { v: 0, label: "All" },
+  { v: 1, label: "New" },
+  { v: 2, label: "Learning" },
+  { v: 3, label: "Familiar" },
+  { v: 4, label: "Good" },
+  { v: 5, label: "Mastered" },
 ];
 
 const LEVEL_COLOR: Record<number, string> = {
@@ -50,14 +50,14 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
 
   return (
     <div className="space-y-5">
-      <p className="text-muted-foreground">{words.length} từ đã học</p>
+      <p className="text-muted-foreground">{words.length} words learned</p>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Tìm từ hoặc nghĩa..."
+          placeholder="Search word or meaning..."
           className="pl-9"
         />
       </div>
@@ -76,7 +76,7 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="py-12 text-center text-muted-foreground">Không có từ nào.</p>
+        <p className="py-12 text-center text-muted-foreground">No words found.</p>
       ) : (
         <ul className="divide-y rounded-xl border-2 bg-white">
           {filtered.map((w) => {
@@ -92,14 +92,14 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{w.term}</span>
                     {w.phonetic_uk && <span className="text-xs text-muted-foreground">{w.phonetic_uk}</span>}
-                    <button onClick={() => playAudio(w.audio_url)} className="text-primary" aria-label="Phát âm">
+                    <button onClick={() => playAudio(w.audio_url)} className="text-primary" aria-label="Play audio">
                       <Volume2 className="h-4 w-4" />
                     </button>
                   </div>
                   <p className="truncate text-sm text-muted-foreground">{w.meaning_vi}</p>
                 </div>
                 <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-medium", LEVEL_COLOR[lvl])}>
-                  Mức {lvl}
+                  Level {lvl}
                 </span>
               </li>
             );

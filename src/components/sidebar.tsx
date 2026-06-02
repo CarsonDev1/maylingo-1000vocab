@@ -20,11 +20,11 @@ const Sidebar = ({ className }: Props) => {
         </div>
       </Link>
       <div className="flex flex-col gap-y-2 flex-1">
-        <SidebarItem label="Học" href="/lessons" iconSrc="/learn.svg" />
-        <SidebarItem label="Ôn tập" href="/review" iconSrc="/points.svg" />
-        <SidebarItem label="Sổ tay" href="/notebook" iconSrc="/notebook.svg" iconClassName="scale-100" />
-        <SidebarItem label="Thành tích" href="/stats" iconSrc="/leaderboard.svg" />
-        <SidebarItem label="Cài đặt" href="/settings" iconSrc="/setting.svg" iconClassName="scale-150" />
+        <SidebarItem label="Learn" href="/lessons" iconSrc="/learn.svg" />
+        <SidebarItem label="Review" href="/review" iconSrc="/points.svg" />
+        <SidebarItem label="Notebook" href="/notebook" iconSrc="/notebook.svg" iconClassName="scale-100" />
+        <SidebarItem label="Achievements" href="/stats" iconSrc="/leaderboard.svg" />
+        <SidebarItem label="Settings" href="/settings" iconSrc="/setting.svg" iconClassName="scale-150" />
       </div>
       <div className="p-4">
         <ClerkLoading>

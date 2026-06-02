@@ -11,17 +11,17 @@ import { createPortal } from "react-dom";
 import { Volume2, Check, X, Snail } from "lucide-react";
 
 const PROMPT: Record<string, string> = {
-  choose_meaning: "Chọn nghĩa đúng",
-  choose_word: "Chọn từ đúng với nghĩa",
-  choose_reading: "Chọn phiên âm đúng",
-  choose_image: "Chọn hình đúng",
-  fill_gap_choose: "Điền từ vào chỗ trống",
-  listen_choose: "Nghe và chọn từ đúng",
-  underlined_meaning: "Chọn nghĩa của từ được gạch chân",
-  fill_gap_type: "Gõ từ còn thiếu",
-  listen_write: "Nghe và gõ lại từ",
-  spell: "Điền từ",
-  flashcard: "Từ mới",
+  choose_meaning: "Choose the correct meaning",
+  choose_word: "Choose the word for this meaning",
+  choose_reading: "Choose the correct pronunciation",
+  choose_image: "Choose the correct image",
+  fill_gap_choose: "Fill in the blank",
+  listen_choose: "Listen and choose the word",
+  underlined_meaning: "Choose the meaning of the underlined word",
+  fill_gap_type: "Type the missing word",
+  listen_write: "Listen and type the word",
+  spell: "Spell the word",
+  flashcard: "New word",
 };
 
 function escapeRe(s: string) {
@@ -122,14 +122,14 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
         <div className="flex items-center gap-4">
           <button
             onClick={() => playAudio(cardAudio)}
-            aria-label="Phát âm"
+            aria-label="Play audio"
             className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-orange-500 shadow transition hover:scale-105"
           >
             <Volume2 className="h-6 w-6" />
           </button>
           <button
             onClick={() => playAudio(cardAudio, 0.55)}
-            aria-label="Phát âm chậm"
+            aria-label="Play slowly"
             className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-orange-500 shadow transition hover:scale-105"
           >
             <Snail className="h-6 w-6" />
@@ -198,13 +198,13 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
           onClick={() => onNext(null)}
           className="w-full rounded-full bg-green-500 py-6 text-base font-bold text-white hover:bg-green-600"
         >
-          Tiếp tục
+          Continue
         </Button>
         <button
           onClick={() => onNext(null)}
           className="text-sm text-neutral-400 underline underline-offset-4 transition hover:text-white"
         >
-          Mình đã thuộc từ này
+          I already know this word
         </button>
       </div>
     );
@@ -217,7 +217,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
         return (
           <div className="flex items-center justify-center gap-2">
             <span className="text-3xl font-bold text-neutral-700">{word.term}</span>
-            <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Phát âm">
+            <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Play audio">
               <Volume2 className="h-6 w-6" />
             </button>
           </div>
@@ -228,7 +228,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
         return (
           <div className="flex items-center justify-center gap-2">
             <span className="text-2xl font-bold text-neutral-700">{word.term}</span>
-            <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Phát âm">
+            <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Play audio">
               <Volume2 className="h-5 w-5" />
             </button>
           </div>
@@ -239,7 +239,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
           <button
             onClick={() => playAudio(word.audio_url)}
             className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-sky-400 text-white transition hover:scale-105 border-sky-500 border-b-4 active:border-b-0"
-            aria-label="Phát lại"
+            aria-label="Replay"
           >
             <Volume2 className="h-9 w-9" />
           </button>
@@ -284,7 +284,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
               autoFocus
               value={typed}
               disabled={result !== null}
-              placeholder="Nhập từ tiếng Anh..."
+              placeholder="Type the English word..."
               onChange={(e) => setTyped(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && result === null) checkTyped();
@@ -297,7 +297,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
             />
             {revealed && result === false && (
               <p className="text-center text-sm">
-                Đáp án: <span className="font-bold text-green-600">{word.term}</span>
+                Answer: <span className="font-bold text-green-600">{word.term}</span>
               </p>
             )}
           </div>
@@ -355,7 +355,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
 
         {isTyped && !isSpell && result === null ? (
           <Button variant="primary" className="w-full" disabled={!typed.trim()} onClick={checkTyped}>
-            Kiểm tra
+            Check
           </Button>
         ) : null}
       </div>
@@ -526,7 +526,7 @@ function ResultDrawer({
           )}
         >
           {correct ? <Check className="h-6 w-6" /> : <X className="h-6 w-6" />}
-          {correct ? "Chính xác!" : "Chưa chính xác"}
+          {correct ? "Correct!" : "Incorrect"}
         </div>
         <div className="px-5 pb-8 pt-3">
           <div className="flex items-start gap-3">
@@ -543,7 +543,7 @@ function ResultDrawer({
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-neutral-800">{word.term}</span>
-                <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Phát âm">
+                <button onClick={() => playAudio(word.audio_url)} className="text-sky-500" aria-label="Play audio">
                   <Volume2 className="h-5 w-5" />
                 </button>
               </div>
@@ -556,7 +556,7 @@ function ResultDrawer({
           </div>
           {word.example_en && <p className="mt-3 text-sm text-neutral-600">{word.example_en}</p>}
           <Button variant={correct ? "secondary" : "danger"} className="mt-5 w-full" onClick={onContinue}>
-            Tiếp tục
+            Continue
           </Button>
         </div>
       </div>

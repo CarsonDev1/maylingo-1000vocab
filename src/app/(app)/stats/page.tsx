@@ -10,7 +10,7 @@ export default async function StatsPage() {
   return (
     <div className="px-6">
       <FeedWrapper>
-        <PageHeader title="Thành tích" />
+        <PageHeader title="Achievements" />
         <StatsClient data={data} />
       </FeedWrapper>
     </div>

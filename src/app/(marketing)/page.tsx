@@ -13,7 +13,7 @@ const MarketingPage = () => {
       </div>
       <div className="flex flex-col items-center gap-y-8">
         <h1 className="text-xl lg:text-3xl font-bold text-neutral-600 max-w-[480px] text-center">
-          Học, luyện tập và ghi nhớ 1000 từ vựng tiếng Anh cùng Maylingo.
+          Learn, practice and memorize 1000 English words with Maylingo.
         </h1>
         <div className="flex flex-col items-center gap-y-3 max-w-[330px] w-full">
           <ClerkLoading>
@@ -23,18 +23,18 @@ const MarketingPage = () => {
             <SignedOut>
               <SignUpButton mode="modal" forceRedirectUrl="/dashboard" signInForceRedirectUrl="/dashboard">
                 <Button className="w-full" size="lg" variant="secondary">
-                  Bắt đầu ngay
+                  Get started
                 </Button>
               </SignUpButton>
               <SignInButton mode="modal" forceRedirectUrl="/dashboard" signUpForceRedirectUrl="/dashboard">
                 <Button className="w-full" size="lg" variant="primaryOutline">
-                  Tôi đã có tài khoản
+                  I already have an account
                 </Button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
               <Button size="lg" variant="secondary" className="w-full" asChild>
-                <Link href="/dashboard">Tiếp tục học</Link>
+                <Link href="/dashboard">Continue learning</Link>
               </Button>
             </SignedIn>
           </ClerkLoaded>

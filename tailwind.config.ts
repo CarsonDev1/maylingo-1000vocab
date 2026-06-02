@@ -6,6 +6,8 @@ const config = {
     "./src/pages/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
     "./src/app/**/*.{ts,tsx}",
+    // level tier colour/gradient class names live here as string literals
+    "./src/lib/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
@@ -68,11 +70,30 @@ const config = {
           from: { transform: "rotateY(90deg)", opacity: "0" },
           to: { transform: "rotateY(0deg)", opacity: "1" },
         },
+        // game XP-bar sheen sweeping left→right
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        // medallion idle glow pulse
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
+          "50%": { opacity: "0.9", transform: "scale(1.08)" },
+        },
+        // level-up emblem pop
+        "badge-pop": {
+          "0%": { transform: "scale(0.6)", opacity: "0" },
+          "60%": { transform: "scale(1.12)", opacity: "1" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "flip-in": "flip-in 0.35s ease-out",
+        shimmer: "shimmer 2.4s linear infinite",
+        "glow-pulse": "glow-pulse 2.8s ease-in-out infinite",
+        "badge-pop": "badge-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)",
       },
     },
   },

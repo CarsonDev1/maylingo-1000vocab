@@ -9,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import type { WordWithProgress, Word } from "@/types";
 
-export function ReviewClient({ words, pool }: { words: WordWithProgress[]; pool: Word[] }) {
+export function ReviewClient({
+  words,
+  pool,
+  xpBefore,
+}: {
+  words: WordWithProgress[];
+  pool: Word[];
+  xpBefore?: number;
+}) {
   const [started, setStarted] = useState(false);
 
   const { steps, ids } = useMemo(() => {
@@ -21,28 +29,28 @@ export function ReviewClient({ words, pool }: { words: WordWithProgress[]; pool:
 
   // The immersive full-screen session only starts after the user taps "Ôn tập ngay".
   if (started) {
-    return <SessionRunner steps={steps} mode="review" wordIds={ids} />;
+    return <SessionRunner steps={steps} mode="review" wordIds={ids} xpBefore={xpBefore} />;
   }
 
   // Landing screen — always shown first when opening Review (mirrors the mobile review tab),
   // so the user never gets dropped straight into the exercises.
   return (
     <div className="px-6">
-      <PageHeader title="Ôn tập" />
+      <PageHeader title="Review" />
       <div className="mx-auto flex max-w-[480px] flex-col items-center gap-y-6 pt-4 text-center">
         <Image src="/mascot.svg" width={120} height={120} alt="Maylingo" />
         <div>
           <p className="text-5xl font-extrabold text-green-600">{words.length}</p>
           <p className="mt-1 text-muted-foreground">
-            từ đã tới “Thời điểm vàng” — ôn hết trong một lượt nhé!
+            words have reached their “Golden Moment” — review them all in one go!
           </p>
         </div>
         <div className="flex w-full flex-col gap-y-3">
           <Button size="lg" variant="primary" className="w-full" onClick={() => setStarted(true)}>
-            Ôn tập ngay ({words.length})
+            Review now ({words.length})
           </Button>
           <Button asChild size="lg" variant="secondaryOutline" className="w-full">
-            <Link href="/dashboard">Để sau</Link>
+            <Link href="/dashboard">Later</Link>
           </Button>
         </div>
       </div>

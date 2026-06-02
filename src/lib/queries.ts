@@ -65,6 +65,8 @@ export async function getLessonsWithStats(userId: string): Promise<LessonWithSta
 export interface DashboardData {
   totalWords: number;
   learnedWords: number;
+  masteredWords: number; // words at the top memory level (5)
+  totalXp: number; // lifetime XP across all days
   dueToday: number;
   streak: Streak;
   todayActivity: DailyActivity | null;
@@ -73,28 +75,42 @@ export interface DashboardData {
 export async function getDashboardData(userId: string): Promise<DashboardData> {
   const db = getSupabaseAdmin();
   const today = new Date().toISOString().slice(0, 10);
-  const [{ count: totalWords }, { data: progress }, streak, { data: activity }] = await Promise.all([
-    db.from("words").select("*", { count: "exact", head: true }),
-    db.from("user_word_progress").select("status,due_at").eq("user_id", userId),
-    getOrCreateStreak(userId),
-    db.from("user_daily_activity").select("*").eq("user_id", userId).eq("activity_date", today).maybeSingle(),
-  ]);
+  const [{ count: totalWords }, { data: progress }, streak, { data: activity }, { data: xpRows }] =
+    await Promise.all([
+      db.from("words").select("*", { count: "exact", head: true }),
+      db.from("user_word_progress").select("status,due_at,memory_level").eq("user_id", userId),
+      getOrCreateStreak(userId),
+      db.from("user_daily_activity").select("*").eq("user_id", userId).eq("activity_date", today).maybeSingle(),
+      db.from("user_daily_activity").select("xp").eq("user_id", userId),
+    ]);
 
   const now = Date.now();
   let learnedWords = 0;
   let dueToday = 0;
-  for (const p of (progress as { status: string; due_at: string | null }[]) ?? []) {
+  let masteredWords = 0;
+  for (const p of (progress as { status: string; due_at: string | null; memory_level: number }[]) ?? []) {
     learnedWords++;
+    if (p.memory_level >= 5) masteredWords++;
     if (p.status === "active" && p.due_at && new Date(p.due_at).getTime() <= now) dueToday++;
   }
+  const totalXp = ((xpRows as { xp: number }[]) ?? []).reduce((s, r) => s + (r.xp ?? 0), 0);
 
   return {
     totalWords: totalWords ?? 0,
     learnedWords,
+    masteredWords,
+    totalXp,
     dueToday,
     streak,
     todayActivity: (activity as DailyActivity) ?? null,
   };
+}
+
+/** Sum of all XP the user has ever earned (lifetime). */
+export async function getTotalXp(userId: string): Promise<number> {
+  const db = getSupabaseAdmin();
+  const { data } = await db.from("user_daily_activity").select("xp").eq("user_id", userId);
+  return ((data as { xp: number }[]) ?? []).reduce((s, r) => s + (r.xp ?? 0), 0);
 }
 
 export async function getOrCreateStreak(userId: string): Promise<Streak> {
@@ -229,6 +245,7 @@ export async function getNotebook(userId: string, level?: number): Promise<WordW
 export interface StatsData {
   totalWords: number;
   learnedWords: number;
+  totalXp: number; // lifetime XP across all days
   proficiency: number[]; // index 0..9 -> count
   levels: number[]; // index 1..5 -> count (levels[0] unused)
   activity: DailyActivity[]; // last ~60 days
@@ -238,12 +255,14 @@ export interface StatsData {
 export async function getStats(userId: string): Promise<StatsData> {
   const db = getSupabaseAdmin();
   const since = new Date(Date.now() - 70 * 86400000).toISOString().slice(0, 10);
-  const [{ count: totalWords }, { data: progress }, { data: activity }, streak] = await Promise.all([
-    db.from("words").select("*", { count: "exact", head: true }),
-    db.from("user_word_progress").select("proficiency,memory_level").eq("user_id", userId),
-    db.from("user_daily_activity").select("*").eq("user_id", userId).gte("activity_date", since).order("activity_date"),
-    getOrCreateStreak(userId),
-  ]);
+  const [{ count: totalWords }, { data: progress }, { data: activity }, streak, { data: xpRows }] =
+    await Promise.all([
+      db.from("words").select("*", { count: "exact", head: true }),
+      db.from("user_word_progress").select("proficiency,memory_level").eq("user_id", userId),
+      db.from("user_daily_activity").select("*").eq("user_id", userId).gte("activity_date", since).order("activity_date"),
+      getOrCreateStreak(userId),
+      db.from("user_daily_activity").select("xp").eq("user_id", userId),
+    ]);
   const proficiency = new Array(10).fill(0);
   const levels = new Array(6).fill(0);
   const rows = (progress as { proficiency: number; memory_level: number }[]) ?? [];
@@ -251,9 +270,11 @@ export async function getStats(userId: string): Promise<StatsData> {
     proficiency[Math.min(9, Math.max(0, p.proficiency))]++;
     levels[Math.min(5, Math.max(1, p.memory_level))]++;
   }
+  const totalXp = ((xpRows as { xp: number }[]) ?? []).reduce((s, r) => s + (r.xp ?? 0), 0);
   return {
     totalWords: totalWords ?? 0,
     learnedWords: rows.length,
+    totalXp,
     proficiency,
     levels,
     activity: (activity as DailyActivity[]) ?? [],

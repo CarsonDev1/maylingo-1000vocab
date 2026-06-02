@@ -4,9 +4,9 @@ import type { MetadataRoute } from "next";
 // Next auto-serves this at /manifest.webmanifest and adds <link rel="manifest">.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Maylingo — Học 1000 từ vựng",
+    name: "Maylingo — Learn 1000 Words",
     short_name: "Maylingo",
-    description: "Học, luyện tập và ghi nhớ 1000 từ vựng tiếng Anh.",
+    description: "Learn, practice and memorize 1000 English words.",
     start_url: "/",
     scope: "/",
     display: "standalone",

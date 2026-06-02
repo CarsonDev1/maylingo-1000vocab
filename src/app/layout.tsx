@@ -7,8 +7,8 @@ import "./globals.css";
 const font = Nunito({ subsets: ["latin", "vietnamese"] });
 
 export const metadata: Metadata = {
-  title: "Maylingo - Học 1000 từ vựng",
-  description: "Ứng dụng học từ vựng tiếng Anh theo chủ đề với lặp lại ngắt quãng.",
+  title: "Maylingo - Learn 1000 Words",
+  description: "Learn English vocabulary by topic with spaced repetition.",
   // Makes "Add to Home Screen" on iOS launch full-screen (standalone) with the mascot icon.
   appleWebApp: {
     capable: true,

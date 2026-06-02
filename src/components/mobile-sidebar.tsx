@@ -10,7 +10,7 @@ const MobileSidebar = () => {
         <Menu className="text-white" />
       </SheetTrigger>
       <SheetContent className="p-0 z-[100]" side="left">
-        <SheetTitle className="sr-only">Điều hướng</SheetTitle>
+        <SheetTitle className="sr-only">Navigation</SheetTitle>
         <Sidebar />
       </SheetContent>
     </Sheet>

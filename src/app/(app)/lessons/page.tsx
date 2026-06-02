@@ -7,23 +7,34 @@ import StickyWrapper from "@/components/sticky-wrapper";
 import UserProgress from "@/components/user-progress";
 import { PageHeader } from "@/components/page-header";
 import { CheckCircle2, ChevronRight, Repeat } from "lucide-react";
+import { LevelProgressBar } from "@/components/level/LevelProgressBar";
+import type { GamificationStats } from "@/lib/badges";
 
 export default async function LessonsPage() {
   const userId = await requireUserId();
   const [lessons, dash] = await Promise.all([getLessonsWithStats(userId), getDashboardData(userId)]);
 
+  const stats: GamificationStats = {
+    totalXp: dash.totalXp,
+    learnedWords: dash.learnedWords,
+    totalWords: dash.totalWords,
+    masteredWords: dash.masteredWords,
+    currentStreak: dash.streak.current_streak,
+    longestStreak: dash.streak.longest_streak,
+  };
+
   return (
     <div className="flex flex-row-reverse gap-[48px] px-6">
       <StickyWrapper>
-        <UserProgress points={dash.learnedWords} streak={dash.streak.current_streak} />
+        <UserProgress stats={stats} />
       </StickyWrapper>
 
       <FeedWrapper>
-        <PageHeader title="1000 Từ Cơ Bản" />
+        <PageHeader title="1000 Basic Words" />
 
         {lessons.length === 0 ? (
           <div className="border-2 rounded-xl p-8 text-center text-muted-foreground">
-            Chưa có dữ liệu. Hãy chạy seed Supabase (xem README) để nạp 1000 từ.
+            No data yet. Run the Supabase seed (see README) to load 1000 words.
           </div>
         ) : (
           <ul className="flex flex-col gap-y-3">
@@ -65,10 +76,12 @@ export default async function LessonsPage() {
                         {l.sort}. {l.title_vi}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
-                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-green-500 transition-all"
-                            style={{ width: `${pct}%` }}
+                        <div className="flex-1">
+                          <LevelProgressBar
+                            value={pct}
+                            fillClassName="from-emerald-400 to-green-500"
+                            glow="#22c55e"
+                            height={10}
                           />
                         </div>
                         <span className="shrink-0 text-xs font-semibold text-muted-foreground">

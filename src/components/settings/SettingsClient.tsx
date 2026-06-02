@@ -15,7 +15,7 @@ export function SettingsClient({ goal }: { goal: number }) {
   function save() {
     startTransition(async () => {
       await setDailyGoal(value);
-      toast.success("Đã lưu mục tiêu hằng ngày");
+      toast.success("Daily goal saved");
     });
   }
 
@@ -23,15 +23,15 @@ export function SettingsClient({ goal }: { goal: number }) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Mục tiêu hằng ngày</CardTitle>
+          <CardTitle>Daily goal</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Số từ bạn muốn học/ôn mỗi ngày để giữ chuỗi streak.
+            How many words you want to learn/review each day to keep your streak.
           </p>
           <div className="flex items-end gap-3">
             <div className="space-y-1">
-              <Label htmlFor="goal">Số từ / ngày</Label>
+              <Label htmlFor="goal">Words / day</Label>
               <Input
                 id="goal"
                 type="number"
@@ -43,7 +43,7 @@ export function SettingsClient({ goal }: { goal: number }) {
               />
             </div>
             <Button variant="primary" onClick={save} disabled={pending}>
-              {pending ? "Đang lưu..." : "Lưu"}
+              {pending ? "Saving..." : "Save"}
             </Button>
           </div>
         </CardContent>
@@ -51,11 +51,11 @@ export function SettingsClient({ goal }: { goal: number }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Tài khoản</CardTitle>
+          <CardTitle>Account</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Quản lý hồ sơ, email và đăng xuất qua nút tài khoản ở thanh bên.
+            Manage your profile, email and sign out via the account button in the sidebar.
           </p>
         </CardContent>
       </Card>

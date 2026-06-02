@@ -10,7 +10,7 @@ export default async function SettingsPage() {
   return (
     <div className="px-6">
       <FeedWrapper>
-        <PageHeader title="Cài đặt" />
+        <PageHeader title="Settings" />
         <SettingsClient goal={streak.daily_goal} />
       </FeedWrapper>
     </div>

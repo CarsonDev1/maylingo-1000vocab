@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 
 // Mirrors the native app's bottom tabs (mobile/src/app/(tabs)/_layout.tsx).
 const TABS = [
-  { label: "Học", href: "/dashboard", Icon: GraduationCap, match: ["/dashboard", "/lessons", "/learn"] },
-  { label: "Ôn tập", href: "/review", Icon: RotateCw, match: ["/review"] },
-  { label: "Sổ tay", href: "/notebook", Icon: BookOpen, match: ["/notebook"] },
-  { label: "Thành tích", href: "/stats", Icon: BarChart3, match: ["/stats"] },
-  { label: "Cài đặt", href: "/settings", Icon: Settings, match: ["/settings"] },
+  { label: "Learn", href: "/dashboard", Icon: GraduationCap, match: ["/dashboard", "/lessons", "/learn"] },
+  { label: "Review", href: "/review", Icon: RotateCw, match: ["/review"] },
+  { label: "Notebook", href: "/notebook", Icon: BookOpen, match: ["/notebook"] },
+  { label: "Achievements", href: "/stats", Icon: BarChart3, match: ["/stats"] },
+  { label: "Settings", href: "/settings", Icon: Settings, match: ["/settings"] },
 ];
 
 /** Bottom tab bar for mobile — replaces the sidebar/hamburger so the web matches the app. Hidden on lg+. */

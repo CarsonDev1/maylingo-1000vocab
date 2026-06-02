@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { requireUserId } from "@/lib/auth";
-import { getLessonById, getNewWordsForLesson, getDistractorPool } from "@/lib/queries";
+import { getLessonById, getNewWordsForLesson, getDistractorPool, getTotalXp } from "@/lib/queries";
 import { LearnClient } from "@/components/session/LearnClient";
 import { Button } from "@/components/ui/button";
 
@@ -9,25 +9,26 @@ export default async function LearnLessonPage({ params }: { params: { lessonId: 
   const userId = await requireUserId();
   const lessonId = Number(params.lessonId);
   const lesson = await getLessonById(lessonId);
-  if (!lesson) return <Notice title="Không tìm thấy bài học" />;
+  if (!lesson) return <Notice title="Lesson not found" />;
 
-  const [words, pool] = await Promise.all([
+  const [words, pool, xpBefore] = await Promise.all([
     getNewWordsForLesson(userId, lessonId),
     getDistractorPool(lessonId, 60),
+    getTotalXp(userId),
   ]);
 
   if (words.length === 0) {
     return (
       <Notice
-        title={`Bạn đã học hết "${lesson.title_en}"`}
-        desc="Tất cả từ trong bài này đã được học. Hãy ôn tập hoặc chọn bài khác."
+        title={`You've finished "${lesson.title_en}"`}
+        desc="You've learned all the words in this lesson. Review them or pick another lesson."
         actions={
           <>
             <Button asChild variant="secondary">
-              <Link href="/review">Ôn tập</Link>
+              <Link href="/review">Review</Link>
             </Button>
             <Button asChild variant="primaryOutline">
-              <Link href="/lessons">Bài khác</Link>
+              <Link href="/lessons">Other lessons</Link>
             </Button>
           </>
         }
@@ -35,7 +36,7 @@ export default async function LearnLessonPage({ params }: { params: { lessonId: 
     );
   }
 
-  return <LearnClient words={words} pool={pool} />;
+  return <LearnClient words={words} pool={pool} xpBefore={xpBefore} />;
 }
 
 function Notice({ title, desc, actions }: { title: string; desc?: string; actions?: React.ReactNode }) {
@@ -48,7 +49,7 @@ function Notice({ title, desc, actions }: { title: string; desc?: string; action
         <div className="mt-6 flex flex-col gap-2">
           {actions ?? (
             <Button asChild variant="secondary">
-              <Link href="/lessons">Về danh sách bài</Link>
+              <Link href="/lessons">Back to lessons</Link>
             </Button>
           )}
         </div>
