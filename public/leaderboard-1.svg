@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="60 55 392 405">
+  <defs>
+    <linearGradient id="blue" x1="110" y1="70" x2="380" y2="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#64DBFF"/>
+      <stop offset="50%" stop-color="#1FA2FF"/>
+      <stop offset="100%" stop-color="#0867E8"/>
+    </linearGradient>
+    <linearGradient id="deepBlue" x1="130" y1="90" x2="400" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D8EFF"/>
+      <stop offset="100%" stop-color="#034BB8"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="170" y1="70" x2="330" y2="250" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFF56A"/>
+      <stop offset="58%" stop-color="#FFC533"/>
+      <stop offset="100%" stop-color="#FF941F"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="90" y1="200" x2="410" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF954A"/>
+      <stop offset="100%" stop-color="#FF4538"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="120" y1="110" x2="400" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F9FDFF"/>
+      <stop offset="100%" stop-color="#DCEEFF"/>
+    </linearGradient>
+    <filter id="shadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#064B9B" flood-opacity="0.24"/>
+    </filter>
+    <filter id="miniShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#895200" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <circle cx="256" cy="258" r="178" fill="#DDF7FF" opacity="0.75"/>
+    <rect x="112" y="132" width="288" height="268" rx="36" fill="url(#deepBlue)"/>
+    <rect x="126" y="145" width="260" height="238" rx="30" fill="url(#panel)" stroke="#FFFFFF" stroke-width="9"/>
+
+    <g filter="url(#miniShadow)">
+      <path d="M177 132l38 36 41-70 41 70 38-36-15 83H192z"
+            fill="url(#gold)" stroke="#FF8A00" stroke-width="8" stroke-linejoin="round"/>
+      <circle cx="215" cy="168" r="10" fill="#FFFFFF" opacity="0.6"/>
+      <circle cx="256" cy="139" r="12" fill="#FFFFFF" opacity="0.65"/>
+      <circle cx="297" cy="168" r="10" fill="#FFFFFF" opacity="0.6"/>
+    </g>
+
+    <g>
+      <rect x="206" y="237" width="100" height="118" rx="22" fill="url(#gold)" stroke="#FF8A00" stroke-width="7"/>
+      <rect x="111" y="282" width="93" height="73" rx="20" fill="url(#blue)" stroke="#0870DD" stroke-width="7"/>
+      <rect x="308" y="260" width="93" height="95" rx="20" fill="url(#orange)" stroke="#E33B31" stroke-width="7"/>
+
+      <text x="256" y="309" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="800" fill="#FFFFFF">1</text>
+      <text x="157" y="329" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#FFFFFF">2</text>
+      <text x="354" y="319" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#FFFFFF">3</text>
+
+      <path d="M230 257h52M134 300h45M331 279h45" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+    </g>
+
+    <g filter="url(#miniShadow)">
+      <circle cx="256" cy="223" r="34" fill="url(#blue)" stroke="#FFFFFF" stroke-width="7"/>
+      <path d="M256 200l8 16 18 3-13 13 3 18-16-8-16 8 3-18-13-13 18-3z"
+            fill="url(#gold)" stroke="#FF8A00" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+
+    <rect x="156" y="366" width="200" height="18" rx="9" fill="#A9D9FF"/>
+    <circle cx="132" cy="375" r="10" fill="#FFC533"/>
+    <circle cx="380" cy="375" r="10" fill="#5EDAFF"/>
+
+    <path d="M90 316l10 19 19 10-19 10-10 19-10-19-19-10 19-10z" fill="#5EDAFF"/>
+    <path d="M420 308l9 17 17 9-17 9-9 17-9-17-17-9 17-9z" fill="#FFD24B"/>
+    <circle cx="96" cy="190" r="8" fill="#FFD24B"/>
+    <circle cx="415" cy="198" r="8" fill="#62DFFF"/>
+  </g>
+</svg>

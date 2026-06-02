@@ -24,7 +24,7 @@ const Sidebar = ({ className }: Props) => {
         <SidebarItem label="Review" href="/review" iconSrc="/points.svg" />
         <SidebarItem label="Notebook" href="/notebook" iconSrc="/notebook.svg" iconClassName="scale-100" />
         <SidebarItem label="Achievements" href="/stats" iconSrc="/leaderboard.svg" />
-        <SidebarItem label="Settings" href="/settings" iconSrc="/setting.svg" iconClassName="scale-150" />
+        <SidebarItem label="Leaderboard" href="/leaderboard" iconSrc="/leaderboard-1.svg" />
       </div>
       <div className="p-4">
         <ClerkLoading>

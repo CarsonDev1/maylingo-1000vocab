@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, RotateCw, BookOpen, BarChart3, Settings } from "lucide-react";
+import { GraduationCap, RotateCw, BookOpen, BarChart3, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mirrors the native app's bottom tabs (mobile/src/app/(tabs)/_layout.tsx).
@@ -11,7 +11,7 @@ const TABS = [
   { label: "Review", href: "/review", Icon: RotateCw, match: ["/review"] },
   { label: "Notebook", href: "/notebook", Icon: BookOpen, match: ["/notebook"] },
   { label: "Achievements", href: "/stats", Icon: BarChart3, match: ["/stats"] },
-  { label: "Settings", href: "/settings", Icon: Settings, match: ["/settings"] },
+  { label: "Leaderboard", href: "/leaderboard", Icon: Trophy, match: ["/leaderboard"] },
 ];
 
 /** Bottom tab bar for mobile — replaces the sidebar/hamburger so the web matches the app. Hidden on lg+. */

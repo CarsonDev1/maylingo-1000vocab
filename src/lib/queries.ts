@@ -113,6 +113,40 @@ export async function getTotalXp(userId: string): Promise<number> {
   return ((data as { xp: number }[]) ?? []).reduce((s, r) => s + (r.xp ?? 0), 0);
 }
 
+export interface LeaderboardEntry {
+  userId: string;
+  totalXp: number;
+  currentStreak: number;
+}
+
+/** Every user ranked by lifetime XP (desc), current streak as the tiebreaker. */
+export async function getLeaderboardRanking(): Promise<LeaderboardEntry[]> {
+  const db = getSupabaseAdmin();
+  const [{ data: xpRows }, { data: streakRows }] = await Promise.all([
+    db.from("user_daily_activity").select("user_id,xp"),
+    db.from("user_streaks").select("user_id,current_streak"),
+  ]);
+
+  const xpByUser = new Map<string, number>();
+  for (const r of (xpRows as { user_id: string; xp: number }[]) ?? []) {
+    xpByUser.set(r.user_id, (xpByUser.get(r.user_id) ?? 0) + (r.xp ?? 0));
+  }
+  const streakByUser = new Map<string, number>();
+  for (const r of (streakRows as { user_id: string; current_streak: number }[]) ?? []) {
+    streakByUser.set(r.user_id, r.current_streak ?? 0);
+    // a user with a streak row but no activity yet still appears (0 XP)
+    if (!xpByUser.has(r.user_id)) xpByUser.set(r.user_id, 0);
+  }
+
+  const entries: LeaderboardEntry[] = Array.from(xpByUser.entries(), ([userId, totalXp]) => ({
+    userId,
+    totalXp,
+    currentStreak: streakByUser.get(userId) ?? 0,
+  }));
+  entries.sort((a, b) => b.totalXp - a.totalXp || b.currentStreak - a.currentStreak);
+  return entries;
+}
+
 export async function getOrCreateStreak(userId: string): Promise<Streak> {
   const db = getSupabaseAdmin();
   const { data } = await db.from("user_streaks").select("*").eq("user_id", userId).maybeSingle();
