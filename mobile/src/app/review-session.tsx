@@ -17,7 +17,7 @@ export default function ReviewSession() {
     let cancelled = false;
     (async () => {
       if (!userId) return;
-      const [queue, pool] = await Promise.all([getReviewQueue(userId, 20), getDistractorPool(undefined, 80)]);
+      const [queue, pool] = await Promise.all([getReviewQueue(userId), getDistractorPool(undefined, 80)]);
       if (cancelled) return;
       const profByWord = new Map<number, number>();
       for (const w of queue) profByWord.set(w.id, w.progress?.proficiency ?? 1);

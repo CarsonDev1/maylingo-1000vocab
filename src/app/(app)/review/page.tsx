@@ -5,19 +5,21 @@ import { getReviewQueue, getDistractorPool, getReviewStatus } from "@/lib/querie
 import { ReviewClient } from "@/components/session/ReviewClient";
 import { GoldenMoment } from "@/components/golden-moment";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 
 export default async function ReviewPage() {
   const userId = await requireUserId();
   const [words, pool, status] = await Promise.all([
-    getReviewQueue(userId, 20),
+    getReviewQueue(userId),
     getDistractorPool(undefined, 80),
     getReviewStatus(userId),
   ]);
 
   if (words.length === 0) {
     return (
-      <div className="mx-auto max-w-md px-6 text-center">
-        <div className="rounded-2xl border-2 p-8">
+      <div className="px-6">
+        <PageHeader title="Ôn tập" />
+        <div className="mx-auto max-w-md rounded-2xl border-2 p-8 text-center">
           <Image src="/mascot.svg" width={90} height={90} alt="" className="mx-auto" />
           {status.nextDueAt ? (
             <>

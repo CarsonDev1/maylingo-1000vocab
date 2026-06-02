@@ -34,24 +34,37 @@ export function SessionRunner({
 
   function handleNext(result: boolean | null) {
     const step = steps[index];
+    // Compute the post-answer tallies up front: setState is async, so reading
+    // `reviewed`/`correct` inside finish() on the LAST step would miss this answer.
+    let nextReviewed = reviewed;
+    let nextCorrect = correct;
     if (mode === "review" && result !== null) {
-      void submitReview(step.word.id, result).catch(() => { });
-      setReviewed((r) => r + 1);
-      if (result) setCorrect((c) => c + 1);
+      void submitReview(step.word.id, result).catch(() => {});
+      nextReviewed = reviewed + 1;
+      setReviewed(nextReviewed);
+      if (result) {
+        nextCorrect = correct + 1;
+        setCorrect(nextCorrect);
+      }
     } else if (result === true) {
-      setCorrect((c) => c + 1);
+      nextCorrect = correct + 1;
+      setCorrect(nextCorrect);
     }
-    if (index + 1 >= total) finish();
+    if (index + 1 >= total) finish(nextReviewed, nextCorrect);
     else setIndex((i) => i + 1);
   }
 
-  function finish() {
+  function finish(finalReviewed: number, finalCorrect: number) {
     setFinished(true);
     playAudio("/finish.mp3");
+    // Persist results in the background. We intentionally do NOT call
+    // router.refresh() here: refreshing the current /review (or /lessons) route
+    // would swap the page to its empty state and yank away this "Hoàn thành!"
+    // screen mid-celebration. The result pages are dynamic and revalidated by the
+    // actions, so the "Về trang chủ" / "Ôn tiếp" links fetch fresh data on click.
     startTransition(async () => {
       if (mode === "learn") await learnWords(wordIds);
-      else await finishReviewSession(reviewed, correct);
-      router.refresh();
+      else await finishReviewSession(finalReviewed, finalCorrect);
     });
   }
 

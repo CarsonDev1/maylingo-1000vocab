@@ -186,17 +186,22 @@ export async function getDistractorPool(excludeLessonId?: number, limit = 60): P
   return (data as Word[]) ?? [];
 }
 
-/** Due active words for review, soonest first. */
-export async function getReviewQueue(userId: string, limit = 20): Promise<WordWithProgress[]> {
+/**
+ * Due active words for review, soonest first.
+ * Returns ALL due words by default so a single session covers the whole queue
+ * (no 20-word cap) — pass `limit` only when you explicitly want a smaller batch.
+ */
+export async function getReviewQueue(userId: string, limit?: number): Promise<WordWithProgress[]> {
   const nowIso = new Date().toISOString();
-  const { data: progress } = await db
+  let q = db
     .from("user_word_progress")
     .select("*")
     .eq("user_id", userId)
     .eq("status", "active")
     .lte("due_at", nowIso)
-    .order("due_at")
-    .limit(limit);
+    .order("due_at");
+  if (limit) q = q.limit(limit);
+  const { data: progress } = await q;
 
   const rows = (progress as WordProgress[]) ?? [];
   if (rows.length === 0) return [];
