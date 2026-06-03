@@ -11,6 +11,7 @@ import { learnWords, submitReview, finishReviewSession } from "@/lib/actions";
 import { playAudio } from "@/lib/audio";
 import { LevelProgressBar } from "@/components/level/LevelProgressBar";
 import { LevelEmblem } from "@/components/level/LevelEmblem";
+import { LevelUpOverlay } from "@/components/level/LevelUpOverlay";
 import { levelFromXp, tierForLevel } from "@/lib/level";
 import type { ExerciseStep } from "@/types";
 import { X } from "lucide-react";
@@ -33,6 +34,7 @@ export function SessionRunner({
   const [correct, setCorrect] = useState(0);
   const [finished, setFinished] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [levelUpSeen, setLevelUpSeen] = useState(false);
   const [, startTransition] = useTransition();
 
   const total = steps.length;
@@ -153,6 +155,9 @@ export function SessionRunner({
             </div>
           </div>
         </div>
+        {leveledUp && !levelUpSeen && (
+          <LevelUpOverlay level={after.level} fromLevel={before.level} onContinue={() => setLevelUpSeen(true)} />
+        )}
       </Overlay>
     );
   }

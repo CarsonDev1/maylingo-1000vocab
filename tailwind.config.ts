@@ -86,6 +86,13 @@ const config = {
           "60%": { transform: "scale(1.12)", opacity: "1" },
           "100%": { transform: "scale(1)" },
         },
+        // level-up celebration confetti (falls from above the viewport)
+        "confetti-fall": {
+          "0%": { transform: "translateY(-12vh) rotate(0deg)" },
+          "100%": { transform: "translateY(102vh) rotate(680deg)" },
+        },
+        // slow rotation for the sunburst rays behind the emblem
+        "spin-slow": { to: { transform: "rotate(360deg)" } },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -94,6 +101,8 @@ const config = {
         shimmer: "shimmer 2.4s linear infinite",
         "glow-pulse": "glow-pulse 2.8s ease-in-out infinite",
         "badge-pop": "badge-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)",
+        "confetti-fall": "confetti-fall 3s linear infinite",
+        "spin-slow": "spin-slow 9s linear infinite",
       },
     },
   },
