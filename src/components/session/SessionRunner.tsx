@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ExerciseView } from "@/components/session/ExerciseView";
-import { learnWords, submitReview, finishReviewSession } from "@/lib/actions";
+import { submitReview } from "@/lib/actions";
 import { playAudio } from "@/lib/audio";
 import { LevelProgressBar } from "@/components/level/LevelProgressBar";
 import { LevelEmblem } from "@/components/level/LevelEmblem";
@@ -35,7 +35,6 @@ export function SessionRunner({
   const [finished, setFinished] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [levelUpSeen, setLevelUpSeen] = useState(false);
-  const [, startTransition] = useTransition();
 
   const total = steps.length;
   const exitHref = mode === "learn" ? "/lessons" : "/dashboard";
@@ -65,15 +64,21 @@ export function SessionRunner({
   function finish(finalReviewed: number, finalCorrect: number) {
     setFinished(true);
     playAudio("/finish.mp3");
-    // Persist results in the background. We intentionally do NOT call
-    // router.refresh() here: refreshing the current /review (or /lessons) route
-    // would swap the page to its empty state and yank away this "Complete!"
-    // screen mid-celebration. The result pages are dynamic and revalidated by the
-    // actions, so the "Back to home" / "Keep reviewing" links fetch fresh data on click.
-    startTransition(async () => {
-      if (mode === "learn") await learnWords(wordIds);
-      else await finishReviewSession(finalReviewed, finalCorrect);
-    });
+    // Persist via a plain fetch to a route handler — NOT a Server Action. A Server
+    // Action would trigger Next's automatic current-route refresh, which re-fetches
+    // the now-empty word list and replaces this finish / level-up screen with the
+    // lesson's "done"/empty state (felt like an unwanted auto-redirect). The result
+    // pages still revalidate, so the "Back to home" / "Keep reviewing" links are fresh.
+    const payload =
+      mode === "learn"
+        ? { mode, wordIds }
+        : { mode, reviewed: finalReviewed, correct: finalCorrect };
+    void fetch("/api/session/finish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
   }
 
   if (total === 0) {
