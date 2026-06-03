@@ -248,8 +248,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
       case "fill_gap_type":
         return (
           <p className="text-center text-lg">
-            {word.example_en ? <Sentence text={word.example_en} term={word.term} mode="blank" /> : word.meaning_vi}
-            {word.meaning_vi && <span className="mt-2 block text-sm text-muted-foreground">({word.meaning_vi})</span>}
+            {word.example_en ? <Sentence text={word.example_en} term={word.term} mode="blank" /> : word.term}
           </p>
         );
       case "underlined_meaning":
