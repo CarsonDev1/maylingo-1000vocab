@@ -106,6 +106,18 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   };
 }
 
+/**
+ * Has the user already set their daily goal for today? Drives the start-of-day
+ * goal popup. "Today" is the UTC date (matching streak/activity logic).
+ */
+export async function wasGoalSetToday(userId: string): Promise<boolean> {
+  const db = getSupabaseAdmin();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await db.from("user_settings").select("settings").eq("user_id", userId).maybeSingle();
+  const goalDate = (data?.settings as { goalDate?: string } | null | undefined)?.goalDate;
+  return goalDate === today;
+}
+
 /** Sum of all XP the user has ever earned (lifetime). */
 export async function getTotalXp(userId: string): Promise<number> {
   const db = getSupabaseAdmin();

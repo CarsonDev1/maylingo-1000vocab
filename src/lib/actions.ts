@@ -141,19 +141,30 @@ export async function finishReviewSession(reviewedCount: number, correctCount: n
   return { ok: true };
 }
 
-export async function setDailyGoal(goal: number): Promise<{ ok: true }> {
+/**
+ * Set the daily goal AND mark it as confirmed for today, so the start-of-day
+ * goal popup won't show again until the next day.
+ */
+export async function confirmDailyGoal(goal: number): Promise<{ ok: true }> {
   const userId = await requireUserId();
   const db = getSupabaseAdmin();
   const g = Math.max(5, Math.min(200, Math.round(goal)));
-  const { data } = await db.from("user_streaks").select("*").eq("user_id", userId).maybeSingle();
+  const today = todayStr();
+
+  const { data: streak } = await db.from("user_streaks").select("*").eq("user_id", userId).maybeSingle();
   await db.from("user_streaks").upsert({
     user_id: userId,
-    current_streak: data?.current_streak ?? 0,
-    longest_streak: data?.longest_streak ?? 0,
-    last_active_date: data?.last_active_date ?? null,
+    current_streak: streak?.current_streak ?? 0,
+    longest_streak: streak?.longest_streak ?? 0,
+    last_active_date: streak?.last_active_date ?? null,
     daily_goal: g,
   });
+
+  // Remember the goal was set for today (stored in the free-form settings jsonb).
+  const { data: s } = await db.from("user_settings").select("settings").eq("user_id", userId).maybeSingle();
+  const settings = { ...((s?.settings as Record<string, unknown> | null) ?? {}), goalDate: today };
+  await db.from("user_settings").upsert({ user_id: userId, settings });
+
   revalidatePath("/dashboard");
-  revalidatePath("/settings");
   return { ok: true };
 }

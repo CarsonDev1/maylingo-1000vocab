@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
 import { requireUserId } from "@/lib/auth";
-import { getDashboardData, getReviewStatus } from "@/lib/queries";
+import { getDashboardData, getReviewStatus, wasGoalSetToday } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { GoldenMoment } from "@/components/golden-moment";
 import FeedWrapper from "@/components/feed-wrapper";
@@ -11,18 +11,20 @@ import UserProgress from "@/components/user-progress";
 import { PageHeader } from "@/components/page-header";
 import { LevelCard } from "@/components/level/LevelCard";
 import { LevelProgressBar } from "@/components/level/LevelProgressBar";
+import { DailyGoalModal } from "@/components/dashboard/DailyGoalModal";
 import type { GamificationStats } from "@/lib/badges";
 
 export default async function DashboardPage() {
   const userId = await requireUserId();
-  const [data, user, review] = await Promise.all([
+  const [data, user, review, goalSetToday] = await Promise.all([
     getDashboardData(userId),
     currentUser(),
     getReviewStatus(userId),
+    wasGoalSetToday(userId),
   ]);
 
-  const learnedToday =
-    (data.todayActivity?.words_learned ?? 0) + (data.todayActivity?.words_reviewed ?? 0);
+  // Today's goal tracks NEW words learned today (reviews keep the streak but don't count here).
+  const learnedToday = data.todayActivity?.words_learned ?? 0;
   const goal = data.streak.daily_goal;
   const goalPct = Math.min(100, Math.round((learnedToday / Math.max(1, goal)) * 100));
   const overallPct = data.totalWords ? Math.round((data.learnedWords / data.totalWords) * 100) : 0;
@@ -38,6 +40,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-row-reverse gap-[48px] px-6">
+      {!goalSetToday && <DailyGoalModal currentGoal={goal} />}
       <StickyWrapper>
         <UserProgress stats={stats} />
 
@@ -48,7 +51,7 @@ export default async function DashboardPage() {
           </div>
           <LevelProgressBar value={goalPct} fillClassName="from-amber-300 to-orange-500" glow="#f59e0b" height={14} />
           <p className="text-xs text-muted-foreground">
-            Learn or review every day to keep your streak 🔥
+            Learn new words every day to keep your streak 🔥
           </p>
         </div>
 
