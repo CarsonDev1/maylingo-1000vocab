@@ -149,7 +149,6 @@ export default function WritingClient({ lessons, wordsByLesson, xpBefore }: Prop
 
   // ── Step: Write ────────────────────────────────────────────────────────────
   if (step === "write" && selectedLesson) {
-    const words = wordsByLesson[selectedLesson.id] ?? [];
     const wordCountColor =
       wordCount < 50 ? "text-orange-500" : wordCount > 200 ? "text-red-500" : "text-green-600";
 
