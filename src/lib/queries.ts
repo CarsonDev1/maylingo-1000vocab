@@ -298,6 +298,27 @@ export interface StatsData {
   streak: Streak;
 }
 
+export interface SimpleWord {
+  id: number;
+  term: string;
+  meaning_vi: string | null;
+}
+
+/** All words the user has learned, grouped by lesson_id. */
+export async function getLearnedWordsGroupedByLesson(userId: string): Promise<Record<number, SimpleWord[]>> {
+  const db = getSupabaseAdmin();
+  const { data: progress } = await db.from("user_word_progress").select("word_id").eq("user_id", userId);
+  const learnedIds = ((progress as { word_id: number }[]) ?? []).map((p) => p.word_id);
+  if (!learnedIds.length) return {};
+  const { data: words } = await db.from("words").select("id,lesson_id,term,meaning_vi").in("id", learnedIds);
+  const result: Record<number, SimpleWord[]> = {};
+  for (const w of (words as { id: number; lesson_id: number; term: string; meaning_vi: string | null }[]) ?? []) {
+    if (!result[w.lesson_id]) result[w.lesson_id] = [];
+    result[w.lesson_id].push({ id: w.id, term: w.term, meaning_vi: w.meaning_vi });
+  }
+  return result;
+}
+
 export async function getStats(userId: string): Promise<StatsData> {
   const db = getSupabaseAdmin();
   const since = new Date(Date.now() - 70 * 86400000).toISOString().slice(0, 10);

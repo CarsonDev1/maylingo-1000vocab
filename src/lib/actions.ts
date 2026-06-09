@@ -141,6 +141,19 @@ export async function finishReviewSession(reviewedCount: number, correctCount: n
   return { ok: true };
 }
 
+/** Persist a writing session: award XP and touch the streak. */
+export async function finishWritingSession(xpEarned: number): Promise<{ ok: true }> {
+  const userId = await requireUserId();
+  if (xpEarned > 0) {
+    await bumpActivity(userId, { xp: xpEarned });
+    await touchStreak(userId);
+  }
+  revalidatePath("/dashboard");
+  revalidatePath("/stats");
+  revalidatePath("/writing");
+  return { ok: true };
+}
+
 /**
  * Set the daily goal AND mark it as confirmed for today, so the start-of-day
  * goal popup won't show again until the next day.
