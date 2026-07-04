@@ -61,12 +61,19 @@ export interface UsageContext {
   example_en: string; // a short English example for that situation
 }
 
+/** A collocation or idiom the word commonly appears in (B4). */
+export interface Collocation {
+  phrase_en: string; // the collocation / idiom
+  meaning_vi: string; // its Vietnamese meaning
+}
+
 /** AI-generated "deep understanding" content for a word (1:1 with Word). */
 export interface WordDetail {
   word_id: number;
   definition_en: string | null; // English–English definition (root nuance)
   nuance_vi: string | null; // short Vietnamese note on register/connotation
   usage_contexts: UsageContext[];
+  collocations: Collocation[]; // common collocations / idioms (B4)
 }
 
 /** A personal example sentence a user wrote for a word (B3), with AI feedback. */

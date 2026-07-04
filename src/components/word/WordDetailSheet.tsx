@@ -120,7 +120,13 @@ export function WordDetailSheet({
 }
 
 function hasContent(detail: WordDetail | null): boolean {
-  return !!detail && (!!detail.definition_en || !!detail.nuance_vi || detail.usage_contexts.length > 0);
+  return (
+    !!detail &&
+    (!!detail.definition_en ||
+      !!detail.nuance_vi ||
+      detail.usage_contexts.length > 0 ||
+      detail.collocations.length > 0)
+  );
 }
 
 function DetailBody({ detail, exampleEn }: { detail: WordDetail | null; exampleEn: string | null }) {
@@ -151,6 +157,22 @@ function DetailBody({ detail, exampleEn }: { detail: WordDetail | null; exampleE
               <li key={i} className="rounded-xl border-2 bg-slate-50 p-3">
                 <p className="text-sm font-medium text-neutral-700">{c.context_vi}</p>
                 <p className="mt-1 italic text-neutral-800">“{c.example_en}”</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {d.collocations.length > 0 && (
+        <section>
+          <h4 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Cụm từ / idiom hay đi kèm
+          </h4>
+          <ul className="space-y-2">
+            {d.collocations.map((c, i) => (
+              <li key={i} className="flex flex-wrap items-baseline gap-x-2 rounded-xl border-2 bg-slate-50 px-3 py-2">
+                <span className="font-semibold text-neutral-800">{c.phrase_en}</span>
+                <span className="text-sm text-muted-foreground">— {c.meaning_vi}</span>
               </li>
             ))}
           </ul>

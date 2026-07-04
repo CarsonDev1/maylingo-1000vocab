@@ -46,6 +46,18 @@ function normalizeContexts(input) {
   }
   return out;
 }
+function normalizeCollocations(input) {
+  if (!Array.isArray(input)) return [];
+  const out = [];
+  for (const item of input) {
+    if (!item || typeof item !== "object") continue;
+    const phrase_en = cleanString(item.phrase_en);
+    const meaning_vi = cleanString(item.meaning_vi);
+    if (phrase_en && meaning_vi) out.push({ phrase_en, meaning_vi });
+    if (out.length === 5) break;
+  }
+  return out;
+}
 
 // ---------- Groq ----------
 async function generate(word) {
@@ -63,9 +75,12 @@ Tạo nội dung "hiểu sâu" cho từ này. Trả về JSON đúng các trư�
   "nuance_vi": "<1 câu TIẾNG VIỆT về sắc thái/ngữ vực: trang trọng hay thân mật, tích cực/tiêu cực, hoặc lưu ý dùng sai thường gặp>",
   "usage_contexts": [
     { "context_vi": "<tình huống người bản xứ hay dùng, mô tả TIẾNG VIỆT ngắn>", "example_en": "<câu ví dụ TIẾNG ANH ngắn, tự nhiên, đúng ngữ cảnh>" }
+  ],
+  "collocations": [
+    { "phrase_en": "<cụm từ/collocation hoặc idiom phổ biến chứa từ này>", "meaning_vi": "<nghĩa tiếng Việt của cụm>" }
   ]
 }
-Yêu cầu: usage_contexts có ĐÚNG 2 hoặc 3 phần tử với các ngữ cảnh KHÁC nhau.`;
+Yêu cầu: usage_contexts có ĐÚNG 2 hoặc 3 phần tử với các ngữ cảnh KHÁC nhau; collocations có 2 đến 4 cụm phổ biến (nếu từ ít đi kèm cụm cố định thì để mảng rỗng).`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -88,9 +103,10 @@ Yêu cầu: usage_contexts có ĐÚNG 2 hoặc 3 phần tử với các ngữ c�
   const definition_en = cleanString(parsed.definition_en);
   const nuance_vi = cleanString(parsed.nuance_vi);
   const usage_contexts = normalizeContexts(parsed.usage_contexts);
+  const collocations = normalizeCollocations(parsed.collocations);
   // Require at least a definition or one usage context to be worth storing.
   if (!definition_en && usage_contexts.length === 0) throw new Error("empty content");
-  return { definition_en, nuance_vi, usage_contexts };
+  return { definition_en, nuance_vi, usage_contexts, collocations };
 }
 
 // ---------- main ----------
@@ -127,6 +143,7 @@ await pool(todo, CONCURRENCY, async (word) => {
         definition_en: content.definition_en,
         nuance_vi: content.nuance_vi,
         usage_contexts: content.usage_contexts,
+        collocations: content.collocations,
         model: GROQ_MODEL,
         generated_at: new Date().toISOString(),
       },

@@ -69,10 +69,14 @@ create table if not exists public.word_details (
   nuance_vi       text,           -- short Vietnamese note on register/connotation
   usage_contexts  jsonb   not null default '[]'::jsonb,
                                   -- [{ context_vi, example_en }], 2–3 native-usage situations
+  collocations    jsonb   not null default '[]'::jsonb,
+                                  -- [{ phrase_en, meaning_vi }], common collocations/idioms (B4)
   model           text,           -- model used to generate (audit)
   generated_at    timestamptz not null default now(),
   updated_at      timestamptz not null default now()
 );
+-- for DBs where word_details existed before B4:
+alter table public.word_details add column if not exists collocations jsonb not null default '[]'::jsonb;
 drop trigger if exists word_details_updated_at on public.word_details;
 create trigger word_details_updated_at before update on public.word_details
   for each row execute function public.set_updated_at();

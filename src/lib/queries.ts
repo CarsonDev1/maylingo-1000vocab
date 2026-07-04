@@ -193,7 +193,7 @@ export async function getWordDetail(wordId: number): Promise<WordDetail | null> 
   const db = getSupabaseAdmin();
   const { data } = await db
     .from("word_details")
-    .select("word_id,definition_en,nuance_vi,usage_contexts")
+    .select("word_id,definition_en,nuance_vi,usage_contexts,collocations")
     .eq("word_id", wordId)
     .maybeSingle();
   if (!data) return null;
