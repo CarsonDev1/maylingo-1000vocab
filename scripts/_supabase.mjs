@@ -3,7 +3,12 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import WebSocket from "ws";
 import { createClient } from "@supabase/supabase-js";
+
+// supabase-js initializes a realtime client in its constructor, which needs a
+// global WebSocket. Node < 22 has none, so provide one (harmless on 22+).
+if (typeof globalThis.WebSocket === "undefined") globalThis.WebSocket = WebSocket;
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
