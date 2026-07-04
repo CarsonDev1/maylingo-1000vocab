@@ -35,7 +35,15 @@ Web app only; the Expo mobile app mirrors these in a later round.
 
 ## Activation (run once against your Supabase)
 
-### 1. Schema — paste into the Supabase SQL editor
+### 1. Schema
+
+Fastest: run the idempotent migration (needs `SUPABASE_DB_HOST` / `SUPABASE_DB_PASSWORD`):
+
+```bash
+node scripts/migrate-method-tables.mjs
+```
+
+Or paste the SQL below into the Supabase SQL editor (equivalent):
 
 ```sql
 -- B1/B4: deep-understanding content
