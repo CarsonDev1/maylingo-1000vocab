@@ -23,6 +23,7 @@ const Sidebar = ({ className }: Props) => {
         <SidebarItem label="Learn" href="/lessons" iconSrc="/learn.svg" />
         <SidebarItem label="Review" href="/review" iconSrc="/points.svg" />
         <SidebarItem label="Writing" href="/writing" iconSrc="/writing.svg" />
+        <SidebarItem label="Speaking" href="/speaking" iconSrc="/speaking.svg" />
         <SidebarItem label="Notebook" href="/notebook" iconSrc="/notebook.svg" iconClassName="scale-100" />
         <SidebarItem label="Achievements" href="/stats" iconSrc="/leaderboard.svg" />
         <SidebarItem label="Leaderboard" href="/leaderboard" iconSrc="/leaderboard-1.svg" />

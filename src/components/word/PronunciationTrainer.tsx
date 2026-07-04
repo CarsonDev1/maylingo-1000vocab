@@ -4,37 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Volume2, Check, X, Loader2 } from "lucide-react";
 import { playAudio } from "@/lib/audio";
 import { scorePronunciation, type PronunciationScore } from "@/lib/pronunciation";
+import { getSpeechRecognitionCtor, type SRInstance } from "@/lib/speech-recognition";
 import { cn } from "@/lib/utils";
 
 const REP_GOAL = 5;
-
-// Minimal typing for the Web Speech API (not in lib.dom for all TS targets).
-interface SRAlternative {
-  transcript: string;
-}
-interface SREvent {
-  results: ArrayLike<ArrayLike<SRAlternative>>;
-}
-interface SRInstance {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  onresult: (e: SREvent) => void;
-  onerror: () => void;
-  onend: () => void;
-  start: () => void;
-  stop: () => void;
-}
-type SRConstructor = new () => SRInstance;
-
-function getRecognitionCtor(): SRConstructor | null {
-  if (typeof window === "undefined") return null;
-  const w = window as unknown as {
-    SpeechRecognition?: SRConstructor;
-    webkitSpeechRecognition?: SRConstructor;
-  };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
 
 /**
  * "Luyện phát âm" (B2) — say the word out loud, transcribed and scored by the
@@ -49,12 +22,12 @@ export function PronunciationTrainer({ term, audioUrl }: { term: string; audioUr
   const recRef = useRef<SRInstance | null>(null);
 
   useEffect(() => {
-    setSupported(getRecognitionCtor() !== null);
+    setSupported(getSpeechRecognitionCtor() !== null);
     return () => recRef.current?.stop();
   }, []);
 
   function listen() {
-    const Ctor = getRecognitionCtor();
+    const Ctor = getSpeechRecognitionCtor();
     if (!Ctor || listening) return;
     const rec = new Ctor();
     recRef.current = rec;
