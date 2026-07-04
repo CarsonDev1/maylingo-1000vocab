@@ -14,7 +14,15 @@ const REP_GOAL = 5;
  * browser's Web Speech API. Encourages repeating to a rep goal (the method's
  * "đọc to 5–10 lần"). Degrades gracefully where speech recognition is missing.
  */
-export function PronunciationTrainer({ term, audioUrl }: { term: string; audioUrl: string | null }) {
+export function PronunciationTrainer({
+  term,
+  audioUrl,
+  onComplete,
+}: {
+  term: string;
+  audioUrl: string | null;
+  onComplete?: () => void;
+}) {
   const [supported, setSupported] = useState(true);
   const [listening, setListening] = useState(false);
   const [result, setResult] = useState<PronunciationScore | null>(null);
@@ -25,6 +33,17 @@ export function PronunciationTrainer({ term, audioUrl }: { term: string; audioUr
     setSupported(getSpeechRecognitionCtor() !== null);
     return () => recRef.current?.stop();
   }, []);
+
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  useEffect(() => {
+    if (reps >= REP_GOAL && !completedRef.current) {
+      completedRef.current = true;
+      onCompleteRef.current?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reps]);
 
   function listen() {
     const Ctor = getSpeechRecognitionCtor();
