@@ -17,7 +17,7 @@ const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
 const limitIdx = args.indexOf("--limit");
 const LIMIT = limitIdx >= 0 ? Number(args[limitIdx + 1]) : Infinity;
-const CONCURRENCY = 4;
+const CONCURRENCY = 2;
 
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const GROQ_MODEL = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
@@ -82,20 +82,33 @@ Tạo nội dung "hiểu sâu" cho từ này. Trả về JSON đúng các trư�
 }
 Yêu cầu: usage_contexts có ĐÚNG 2 hoặc 3 phần tử với các ngữ cảnh KHÁC nhau; collocations có 2 đến 4 cụm phổ biến (nếu từ ít đi kèm cụm cố định thì để mảng rỗng).`;
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_KEY}` },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.5,
-      max_tokens: 800,
-    }),
+  const payload = JSON.stringify({
+    model: GROQ_MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 0.5,
+    max_tokens: 800,
   });
+
+  let res;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_KEY}` },
+      body: payload,
+    });
+    // Back off and retry on rate-limit / transient errors (respect Retry-After).
+    if (res.status === 429 || res.status === 503) {
+      const ra = parseFloat(res.headers.get("retry-after") ?? "");
+      const waitMs = Number.isFinite(ra) ? ra * 1000 + 500 : Math.min(30000, 1500 * 2 ** attempt);
+      await sleep(waitMs);
+      continue;
+    }
+    break;
+  }
   if (!res.ok) throw new Error(`Groq ${res.status}`);
   const data = await res.json();
   const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? "{}");
