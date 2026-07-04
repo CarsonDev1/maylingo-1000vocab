@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { playAudio } from "@/lib/audio";
 import type { ExerciseStep, ExerciseOption, Word } from "@/types";
 import { createPortal } from "react-dom";
-import { Volume2, Check, X, Snail } from "lucide-react";
+import { Volume2, Check, X, Snail, BookOpen } from "lucide-react";
+import { WordDetailSheet } from "@/components/word/WordDetailSheet";
 
 const PROMPT: Record<string, string> = {
   choose_meaning: "Choose the correct meaning",
@@ -75,6 +76,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
   const [revealed, setRevealed] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [result, setResult] = useState<boolean | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -133,6 +135,13 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
             className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-orange-500 shadow transition hover:scale-105"
           >
             <Snail className="h-6 w-6" />
+          </button>
+          <button
+            onClick={() => setDetailOpen(true)}
+            aria-label="Deep understanding"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-green-600 shadow transition hover:scale-105"
+          >
+            <BookOpen className="h-6 w-6" />
           </button>
         </div>
         <div className="w-full cursor-pointer select-none [perspective:1200px]" onClick={() => setFlipped((f) => !f)}>
@@ -206,6 +215,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
         >
           I already know this word
         </button>
+        <WordDetailSheet word={word} open={detailOpen} onOpenChange={setDetailOpen} />
       </div>
     );
   }

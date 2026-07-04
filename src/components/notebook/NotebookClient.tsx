@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { playAudio } from "@/lib/audio";
 import type { WordWithProgress } from "@/types";
 import { Search, Volume2 } from "lucide-react";
+import { WordDetailSheet } from "@/components/word/WordDetailSheet";
 
 const LEVELS = [
   { v: 0, label: "All" },
@@ -29,6 +30,7 @@ const LEVEL_COLOR: Record<number, string> = {
 export function NotebookClient({ words }: { words: WordWithProgress[] }) {
   const [q, setQ] = useState("");
   const [level, setLevel] = useState(0);
+  const [selected, setSelected] = useState<WordWithProgress | null>(null);
 
   const counts = useMemo(() => {
     const c: Record<number, number> = { 0: words.length, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -82,7 +84,19 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
           {filtered.map((w) => {
             const lvl = w.progress?.memory_level ?? 1;
             return (
-              <li key={w.id} className="flex items-center gap-3 p-3">
+              <li
+                key={w.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelected(w)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelected(w);
+                  }
+                }}
+                className="flex cursor-pointer items-center gap-3 p-3 transition hover:bg-slate-50"
+              >
                 {w.image_url ? (
                   <Image src={w.image_url} alt={w.term} width={48} height={48} className="h-12 w-12 rounded-lg object-cover" unoptimized />
                 ) : (
@@ -92,7 +106,14 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{w.term}</span>
                     {w.phonetic_uk && <span className="text-xs text-muted-foreground">{w.phonetic_uk}</span>}
-                    <button onClick={() => playAudio(w.audio_url)} className="text-primary" aria-label="Play audio">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playAudio(w.audio_url);
+                      }}
+                      className="text-primary"
+                      aria-label="Play audio"
+                    >
                       <Volume2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -106,6 +127,14 @@ export function NotebookClient({ words }: { words: WordWithProgress[] }) {
           })}
         </ul>
       )}
+
+      <WordDetailSheet
+        word={selected}
+        open={selected !== null}
+        onOpenChange={(o) => {
+          if (!o) setSelected(null);
+        }}
+      />
     </div>
   );
 }

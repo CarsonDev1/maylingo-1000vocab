@@ -61,6 +61,22 @@ create table if not exists public.words (
 );
 create index if not exists idx_words_lesson on public.words(lesson_id);
 
+-- "Deep understanding" (B1) — AI-generated, one row per word. Kept separate
+-- from `words` so it can be regenerated/backfilled without touching core data.
+create table if not exists public.word_details (
+  word_id         integer primary key references public.words(id) on delete cascade,
+  definition_en   text,           -- English–English definition (root nuance)
+  nuance_vi       text,           -- short Vietnamese note on register/connotation
+  usage_contexts  jsonb   not null default '[]'::jsonb,
+                                  -- [{ context_vi, example_en }], 2–3 native-usage situations
+  model           text,           -- model used to generate (audit)
+  generated_at    timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+drop trigger if exists word_details_updated_at on public.word_details;
+create trigger word_details_updated_at before update on public.word_details
+  for each row execute function public.set_updated_at();
+
 -- ============================================================
 --  PER-USER state (Clerk user id = text)
 -- ============================================================

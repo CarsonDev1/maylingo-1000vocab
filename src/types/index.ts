@@ -55,6 +55,20 @@ export interface WordWithProgress extends Word {
   progress: WordProgress | null;
 }
 
+/** One native-usage situation for the "deep understanding" (B1) content. */
+export interface UsageContext {
+  context_vi: string; // when/how native speakers use it (Vietnamese)
+  example_en: string; // a short English example for that situation
+}
+
+/** AI-generated "deep understanding" content for a word (1:1 with Word). */
+export interface WordDetail {
+  word_id: number;
+  definition_en: string | null; // English–English definition (root nuance)
+  nuance_vi: string | null; // short Vietnamese note on register/connotation
+  usage_contexts: UsageContext[];
+}
+
 export interface LessonWithStats extends Lesson {
   total_words: number;
   learned_words: number;

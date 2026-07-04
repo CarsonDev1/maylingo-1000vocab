@@ -1,5 +1,6 @@
 import "server-only";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
+import { validateWordDetail } from "@/lib/word-detail";
 import type {
   Course,
   Lesson,
@@ -7,6 +8,7 @@ import type {
   Word,
   WordProgress,
   WordWithProgress,
+  WordDetail,
   Streak,
   DailyActivity,
 } from "@/types";
@@ -184,6 +186,18 @@ export async function getWordsByLesson(lessonId: number): Promise<Word[]> {
   const db = getSupabaseAdmin();
   const { data } = await db.from("words").select("*").eq("lesson_id", lessonId).order("id");
   return (data as Word[]) ?? [];
+}
+
+/** "Deep understanding" (B1) content for a word, or null if not generated yet. */
+export async function getWordDetail(wordId: number): Promise<WordDetail | null> {
+  const db = getSupabaseAdmin();
+  const { data } = await db
+    .from("word_details")
+    .select("word_id,definition_en,nuance_vi,usage_contexts")
+    .eq("word_id", wordId)
+    .maybeSingle();
+  if (!data) return null;
+  return validateWordDetail(wordId, data);
 }
 
 /** New (not-yet-learned) words in a lesson — the whole lesson by default, optionally capped at `limit`. */
