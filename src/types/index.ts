@@ -107,9 +107,11 @@ export interface DailyActivity {
   xp: number;
 }
 
-// The ten exercise types replicated from the MochiDemy learn flow.
+// The exercise types replicated from the MochiDemy learn flow, plus the
+// guided-method practice steps (pronounce, write_example) used when learning
+// new words. flashcard + these three are non-graded (practice/intro) steps.
 export type ExerciseType =
-  | "flashcard" // intro flip card
+  | "flashcard" // intro flip card + deep understanding (B1/B4)
   | "choose_meaning" // EN word -> pick VI meaning
   | "choose_word" // VI meaning -> pick EN word
   | "choose_reading" // pick correct phonetic
@@ -119,7 +121,9 @@ export type ExerciseType =
   | "listen_choose" // audio -> pick word/meaning
   | "listen_write" // audio -> type word
   | "underlined_meaning" // sentence w/ underlined word -> pick meaning
-  | "spell"; // VI meaning -> spell/type the EN word
+  | "spell" // VI meaning -> spell/type the EN word
+  | "pronounce" // B2: read the word aloud, mic-scored (non-graded)
+  | "write_example"; // B3: write a personal example sentence (non-graded)
 
 export interface ExerciseOption {
   /** display text (word or meaning or phonetic) */

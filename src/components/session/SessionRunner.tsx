@@ -13,6 +13,7 @@ import { LevelProgressBar } from "@/components/level/LevelProgressBar";
 import { LevelEmblem } from "@/components/level/LevelEmblem";
 import { LevelUpOverlay } from "@/components/level/LevelUpOverlay";
 import { levelFromXp, tierForLevel } from "@/lib/level";
+import { isGradedStep } from "@/lib/exercises";
 import type { ExerciseStep } from "@/types";
 import { X } from "lucide-react";
 
@@ -90,7 +91,7 @@ export function SessionRunner({
   }
 
   if (finished) {
-    const graded = mode === "review" ? reviewed : steps.filter((s) => s.type !== "flashcard").length;
+    const graded = mode === "review" ? reviewed : steps.filter(isGradedStep).length;
     const acc = graded ? Math.round((correct / graded) * 100) : 100;
     // XP earned this session — mirrors the server: +10 per new word, +5 per correct review.
     const xpGained = mode === "learn" ? wordIds.length * 10 : correct * 5;
