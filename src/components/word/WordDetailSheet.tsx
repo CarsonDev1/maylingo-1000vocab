@@ -9,6 +9,7 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PronunciationTrainer } from "@/components/word/PronunciationTrainer";
 import { playAudio } from "@/lib/audio";
 import type { Word, WordDetail } from "@/types";
 
@@ -86,6 +87,11 @@ export function WordDetailSheet({
                 </div>
               </div>
               <DrawerDescription className="sr-only">Deep understanding for {word.term}</DrawerDescription>
+
+              {/* Luyện phát âm (B2) */}
+              <div className="mt-4">
+                <PronunciationTrainer term={word.term} audioUrl={word.audio_url} />
+              </div>
 
               {/* Hiểu sâu */}
               <div className="mt-5 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-green-600">
