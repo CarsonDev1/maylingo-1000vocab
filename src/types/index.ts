@@ -69,6 +69,15 @@ export interface WordDetail {
   usage_contexts: UsageContext[];
 }
 
+/** A personal example sentence a user wrote for a word (B3), with AI feedback. */
+export interface UserWordExample {
+  id: number;
+  word_id: number;
+  text: string;
+  feedback: string | null;
+  created_at: string;
+}
+
 export interface LessonWithStats extends Lesson {
   total_words: number;
   learned_words: number;

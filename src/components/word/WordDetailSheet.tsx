@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PronunciationTrainer } from "@/components/word/PronunciationTrainer";
+import { PersonalExamples } from "@/components/word/PersonalExamples";
 import { playAudio } from "@/lib/audio";
 import type { Word, WordDetail } from "@/types";
 
@@ -104,6 +105,11 @@ export function WordDetailSheet({
                 ) : (
                   <DetailBody detail={state.detail} exampleEn={word.example_en} />
                 )}
+              </div>
+
+              {/* Ví dụ của bạn (B3) */}
+              <div className="mt-6 border-t pt-5">
+                <PersonalExamples wordId={word.id} term={word.term} />
               </div>
             </>
           )}
