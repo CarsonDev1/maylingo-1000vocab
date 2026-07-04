@@ -9,7 +9,10 @@ import { playAudio } from "@/lib/audio";
 import type { ExerciseStep, ExerciseOption, Word } from "@/types";
 import { createPortal } from "react-dom";
 import { Volume2, Check, X, Snail, BookOpen } from "lucide-react";
-import { WordDetailSheet } from "@/components/word/WordDetailSheet";
+import { WordDeepContent, WordDeepContentSkeleton } from "@/components/word/WordDeepContent";
+import { PronunciationTrainer } from "@/components/word/PronunciationTrainer";
+import { PersonalExamples } from "@/components/word/PersonalExamples";
+import type { WordDetail } from "@/types";
 
 const PROMPT: Record<string, string> = {
   choose_meaning: "Choose the correct meaning",
@@ -23,6 +26,8 @@ const PROMPT: Record<string, string> = {
   listen_write: "Listen and type the word",
   spell: "Spell the word",
   flashcard: "New word",
+  pronounce: "Đọc to từ này",
+  write_example: "Tự đặt câu với từ này",
 };
 
 function escapeRe(s: string) {
@@ -76,7 +81,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
   const [revealed, setRevealed] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [result, setResult] = useState<boolean | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [detail, setDetail] = useState<WordDetail | null | "loading">("loading");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -90,6 +95,23 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
       return () => clearTimeout(t);
     }
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (type !== "flashcard") return;
+    let cancelled = false;
+    setDetail("loading");
+    fetch(`/api/word/${word.id}/detail`)
+      .then((r) => (r.ok ? r.json() : { detail: null }))
+      .then((d) => {
+        if (!cancelled) setDetail((d?.detail as WordDetail | null) ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setDetail(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [type, word.id]);
 
   const isTyped = type === "fill_gap_type" || type === "listen_write" || type === "spell";
   const isSpell = type === "spell";
@@ -135,13 +157,6 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
             className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-orange-500 shadow transition hover:scale-105"
           >
             <Snail className="h-6 w-6" />
-          </button>
-          <button
-            onClick={() => setDetailOpen(true)}
-            aria-label="Deep understanding"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-green-600 shadow transition hover:scale-105"
-          >
-            <BookOpen className="h-6 w-6" />
           </button>
         </div>
         <div className="w-full cursor-pointer select-none [perspective:1200px]" onClick={() => setFlipped((f) => !f)}>
@@ -203,6 +218,17 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
           </div>
         </div>
 
+        <div className="w-full rounded-2xl bg-white p-4 text-left text-neutral-800">
+          <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-green-600">
+            <BookOpen className="h-4 w-4" /> Hiểu sâu
+          </div>
+          {detail === "loading" ? (
+            <WordDeepContentSkeleton />
+          ) : (
+            <WordDeepContent detail={detail} exampleEn={word.example_en} />
+          )}
+        </div>
+
         <Button
           onClick={() => onNext(null)}
           className="w-full rounded-full bg-green-500 py-6 text-base font-bold text-white hover:bg-green-600"
@@ -215,8 +241,33 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
         >
           I already know this word
         </button>
-        <WordDetailSheet word={word} open={detailOpen} onOpenChange={setDetailOpen} />
       </div>
+    );
+  }
+
+  if (type === "pronounce") {
+    return (
+      <Card index={index} total={total} title={PROMPT[type]}>
+        <PronounceStep word={word} onDone={() => onNext(null)} />
+      </Card>
+    );
+  }
+
+  if (type === "write_example") {
+    return (
+      <Card index={index} total={total} title={PROMPT[type]}>
+        <div className="space-y-6">
+          <PersonalExamples wordId={word.id} term={word.term} />
+          <div className="flex gap-3">
+            <Button variant="ghost" className="flex-1" onClick={() => onNext(null)}>
+              Bỏ qua
+            </Button>
+            <Button variant="primary" className="flex-1" onClick={() => onNext(null)}>
+              Xong
+            </Button>
+          </div>
+        </div>
+      </Card>
     );
   }
 
@@ -370,6 +421,35 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
       </div>
       <ResultDrawer open={result !== null} correct={result === true} word={word} onContinue={() => onNext(result)} />
     </Card>
+  );
+}
+
+/** B2 practice step: read the word aloud to the rep goal, then continue. */
+function PronounceStep({ word, onDone }: { word: Word; onDone: () => void }) {
+  const [reachedGoal, setReachedGoal] = useState(false);
+  return (
+    <div className="space-y-6">
+      <p className="text-center text-2xl font-bold text-neutral-700">{word.term}</p>
+      <PronunciationTrainer term={word.term} audioUrl={word.audio_url} onComplete={() => setReachedGoal(true)} />
+      <div className="flex gap-3">
+        <Button variant="ghost" className="flex-1" onClick={onDone}>
+          Bỏ qua
+        </Button>
+        <Button
+          variant="primary"
+          className="flex-1"
+          disabled={!reachedGoal}
+          onClick={onDone}
+        >
+          Tiếp tục
+        </Button>
+      </div>
+      {!reachedGoal && (
+        <p className="text-center text-xs text-muted-foreground">
+          Đọc đủ 5 lần để mở nút Tiếp tục, hoặc bấm Bỏ qua.
+        </p>
+      )}
+    </div>
   );
 }
 
