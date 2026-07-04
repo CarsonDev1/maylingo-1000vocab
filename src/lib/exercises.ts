@@ -81,22 +81,47 @@ function pickTypeFor(word: Word, pool: Word[], allow: ExerciseType[]): ExerciseT
 }
 
 /**
- * Learn-new session — mirrors MochiDemy's "Learn new words" flow. PER WORD, in order:
- *   1. flashcard      — intro card (sentence + word + phonetic + meaning + audio)
- *   2. listen_write   — "Listen and write" (hear the word, type it)
- *   3. spell          — "Spell the word" (given the VI meaning, spell the EN word)
- * then move on to the next word. No multiple-choice while learning new words —
- * those only appear during review. listen_write is skipped if the word has no audio.
+ * Learn-new session — the guided active-recall method. PER WORD, in order:
+ *   1. flashcard      — intro card + deep understanding (B1/B4) shown inline
+ *   2. pronounce      — "Đọc to" (B2): say the word aloud, mic-scored (skippable)
+ *   3. listen_write   — "Listen and write" active recall (skipped if no audio)
+ *   4. spell          — "Spell the word" active recall
+ *   5. write_example  — "Tự đặt câu" (B3): write a personal sentence (skippable)
+ * Steps 1, 2, 5 are non-graded practice/intro steps (see isGradedStep).
  */
 export function buildLearnSteps(words: Word[], pool: Word[]): ExerciseStep[] {
   const fullPool = [...pool, ...words];
   const steps: ExerciseStep[] = [];
   for (const w of words) {
     steps.push(makeStep("flashcard", w, fullPool));
+    steps.push(makeStep("pronounce", w, fullPool));
     if (w.audio_url) steps.push(makeStep("listen_write", w, fullPool));
     steps.push(makeStep("spell", w, fullPool));
+    steps.push(makeStep("write_example", w, fullPool));
   }
   return steps;
+}
+
+/**
+ * Types that count toward session accuracy — the real recall/MC/typed exercises.
+ * Intro/practice steps (flashcard, pronounce, write_example) are excluded.
+ */
+const GRADED_TYPES = new Set<ExerciseType>([
+  "choose_meaning",
+  "choose_word",
+  "choose_reading",
+  "choose_image",
+  "fill_gap_choose",
+  "fill_gap_type",
+  "listen_choose",
+  "listen_write",
+  "underlined_meaning",
+  "spell",
+]);
+
+/** True when a step is a graded exercise (used for the accuracy denominator). */
+export function isGradedStep(step: ExerciseStep): boolean {
+  return GRADED_TYPES.has(step.type);
 }
 
 /**
