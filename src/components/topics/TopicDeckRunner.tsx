@@ -9,6 +9,7 @@ import { playAudio } from "@/lib/audio";
 import { finishTopicDay } from "@/lib/actions";
 import { VocabSlide } from "@/components/topics/VocabSlide";
 import { AttributeSlide } from "@/components/topics/AttributeSlide";
+import { VoiceQASlide } from "@/components/topics/VoiceQASlide";
 import type { TopicDeck, Word } from "@/types";
 
 export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[] }) {
@@ -83,14 +84,7 @@ export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[
         <div className="mx-auto w-full max-w-xl rounded-2xl bg-white p-6" key={index}>
           {slide.type === "vocab" && <VocabSlide slide={slide} words={words} onDone={next} />}
           {slide.type === "attribute" && <AttributeSlide slide={slide} words={words} onDone={next} />}
-          {slide.type === "voice_qa" && (
-            <div className="mx-auto flex w-full max-w-md flex-col gap-4 text-center">
-              <p className="text-sm font-bold uppercase tracking-wide text-sky-600">Câu hỏi luyện nói</p>
-              <p className="text-lg font-semibold text-neutral-800">{slide.question_en}</p>
-              <p className="text-sm text-muted-foreground">{slide.question_vi}</p>
-              <Button variant="primary" onClick={() => next()}>Tiếp tục</Button>
-            </div>
-          )}
+          {slide.type === "voice_qa" && <VoiceQASlide slide={slide} dayNo={deck.day_no} onDone={next} />}
         </div>
       </div>
     </Overlay>
