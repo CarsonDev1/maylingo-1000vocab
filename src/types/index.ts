@@ -143,3 +143,47 @@ export interface AnswerResult {
   wordId: number;
   correct: boolean;
 }
+
+// ── 30-day topic program ────────────────────────────────────────────────────
+export interface VocabSlide {
+  type: "vocab";
+  word_id: number;
+}
+export interface AttributeOption {
+  label: string;
+  correct: boolean;
+}
+export interface AttributeSlide {
+  type: "attribute";
+  word_id: number | null; // optional image anchor
+  prompt_en: string;
+  prompt_vi: string;
+  options: AttributeOption[];
+  explain_vi: string | null;
+}
+export interface VoiceQaSlide {
+  type: "voice_qa";
+  question_en: string;
+  question_vi: string;
+  key_points: string[];
+  sample_answer_en: string | null;
+}
+export type TopicSlide = VocabSlide | AttributeSlide | VoiceQaSlide;
+
+export interface TopicDeck {
+  day_no: number;
+  lesson_id: number;
+  title_en: string | null;
+  title_vi: string | null;
+  slides: TopicSlide[];
+}
+
+export interface TopicDaySummary {
+  day_no: number;
+  lesson_id: number;
+  title_en: string | null;
+  title_vi: string | null;
+  unlocked: boolean;
+  completed: boolean;
+  best_score: number | null;
+}
