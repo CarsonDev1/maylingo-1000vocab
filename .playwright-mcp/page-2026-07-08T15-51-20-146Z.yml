@@ -1,0 +1,64 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: M
+        - text: Maylingo
+      - generic [ref=e6]: Lộ trình · Ngày 19 · Shopping
+    - generic [ref=e10]:
+      - generic [ref=e11]: Chủ đề · Giao tiếp đời sống
+      - heading "Shopping & Clothes" [level=1] [ref=e12]
+      - paragraph [ref=e13]: "Học cách mua sắm quần áo bằng tiếng Anh: gọi tên trang phục, mô tả chất liệu & size, và xử lý một cuộc hội thoại ở cửa hàng."
+      - generic [ref=e14]:
+        - text: "🎯 Sau hôm nay bạn có thể:"
+        - generic [ref=e15]: tự tin hỏi mua đồ & thử đồ
+    - generic [ref=e16]:
+      - button "← Trước" [ref=e17] [cursor=pointer]
+      - button "Tiếp →" [ref=e18] [cursor=pointer]
+    - generic [ref=e19]: Bản mẫu giao diện (mockup) · phím ← → để chuyển slide · light mode
+  - text: "`; const G = { shirt: svg(\"0 0 120 120\", `"
+  - generic [ref=e25]:
+    - text: "`), tshirt: svg(\"0 0 120 120\", `"
+    - generic [ref=e27]:
+      - text: "`), trousers: svg(\"0 0 120 120\", `"
+      - generic [ref=e29]:
+        - text: "`), jacket: svg(\"0 0 120 120\", `"
+        - generic [ref=e32]:
+          - text: "`), dress: svg(\"0 0 120 120\", `"
+          - generic [ref=e35]:
+            - text: "`), shoes: svg(\"0 0 120 120\", `"
+            - generic [ref=e39]:
+              - text: "`), }; // scene: store rack document.getElementById(\"art-store\").innerHTML = svg(\"0 0 220 220\", `"
+              - generic [ref=e43]:
+                - text: "`); // scene: person entering store document.getElementById(\"art-enter\").innerHTML = svg(\"0 0 240 200\", `"
+                - generic [ref=e47]:
+                  - text: "`); // spotlight shirt (bigger, numbered dots) document.getElementById(\"art-shirt\").innerHTML = svg(\"0 0 200 200\", `"
+                  - generic [ref=e53]:
+                    - generic [ref=e55]:
+                      - text: "1"
+                      - generic [ref=e56]:
+                        - text: "2"
+                        - generic [ref=e57]:
+                          - text: "3"
+                          - generic [ref=e58]: "4"
+                    - text: "`); // fitting room scene document.getElementById(\"art-fitting\").innerHTML = svg(\"0 0 220 220\", `"
+                    - generic [ref=e65]:
+                      - text: "Fitting room`); // ---------- data ---------- const VOCAB = [ { k:\"shirt\", t:\"shirt\", ph:\"/ʃɜːrt/\", vi:\"áo sơ mi\" }, { k:\"tshirt\", t:\"T-shirt\", ph:\"/ˈtiː ʃɜːrt/\", vi:\"áo phông\" }, { k:\"trousers\", t:\"trousers\", ph:\"/ˈtraʊzərz/\", vi:\"quần dài\" }, { k:\"jacket\", t:\"jacket\", ph:\"/ˈdʒækɪt/\", vi:\"áo khoác\" }, { k:\"dress\", t:\"dress\", ph:\"/dres/\", vi:\"váy liền\" }, { k:\"shoes\", t:\"shoes\", ph:\"/ʃuːz/\", vi:\"giày\" }, ]; const KMAP = { shirt:G.shirt, tshirt:G.tshirt, trousers:G.trousers, jacket:G.jacket, dress:G.dress, shoes:G.shoes }; const LABELS = [ {t:\"collar\",vi:\"cổ áo\"},{t:\"sleeve\",vi:\"tay áo\"},{t:\"button\",vi:\"cúc áo\"},{t:\"cuff\",vi:\"măng-sét\"} ]; const FABRICS = [ {t:\"cotton\",ok:true},{t:\"steel\",ok:false},{t:\"paper\",ok:false},{t:\"silk\",ok:false} ]; const FAB_NOTE = \"Áo sơ mi công sở phổ biến nhất làm từ cotton — thoáng, dễ giặt. (“silk” dùng cho loại cao cấp.)\"; const SIZES = [\"S\",\"M\",\"L\",\"XL\"]; const PH1 = [ {t:\"I'm looking for…\",vi:\"Tôi đang tìm…\"},{t:\"Do you have this in…?\",vi:\"Có cái này màu/size…không?\"} ]; const PH2 = [ {t:\"Can I try this on?\",vi:\"Tôi thử cái này được không?\"},{t:\"Where's the fitting room?\",vi:\"Phòng thử đồ ở đâu?\"} ]; const SCENE = [ { who:\"staff\", cls:\"staff\", en:\"Hi! Can I help you find anything?\", vi:\"Chào bạn! Cần giúp tìm gì không?\" }, { who:\"you\", cls:\"you\", en:\"Yes, I'm looking for a formal shirt.\", vi:\"Vâng, tôi tìm một chiếc áo sơ mi công sở.\" }, { who:\"staff\", cls:\"staff\", en:\"Sure. What size are you?\", vi:\"Được ạ. Bạn mặc size nào?\" }, { who:\"you\", cls:\"you\", en:\"Medium. Where's the fitting room?\", vi:\"Size M. Phòng thử đồ ở đâu ạ?\" }, ]; const say = (text) => { try { if(!(\"speechSynthesis\" in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang=\"en-US\"; u.rate=.95; speechSynthesis.speak(u); } catch(e){} }; // vocab const vgrid = document.getElementById(\"vgrid\"); VOCAB.forEach(v => { const c = document.createElement(\"div\"); c.className=\"vcard\"; c.innerHTML = `"
+                      - button "Nghe" [ref=e66]: 🔊
+                      - generic [ref=e67]: "${KMAP[v.k]}"
+                      - generic [ref=e68]: "${v.t}"
+                      - generic [ref=e69]:
+                        - text: "${v.ph}"
+                        - text: "${v.vi}"
+                      - text: "`; c.addEventListener(\"click\", ()=>c.classList.toggle(\"open\")); c.querySelector(\".spk\").addEventListener(\"click\", e=>{e.stopPropagation(); c.classList.add(\"open\"); say(v.t);}); vgrid.appendChild(c); }); // labels const labelsBox = document.getElementById(\"labels\"); LABELS.forEach((l,i)=>{ const b=document.createElement(\"button\"); b.className=\"label\"; b.innerHTML=`${i+1}"
+                      - generic [ref=e70]: "${l.t}${l.vi}"
+                      - text: "`; b.addEventListener(\"click\",()=>say(l.t)); labelsBox.appendChild(b); }); // fabric const chipsBox=document.getElementById(\"fabricChips\"), fabExplain=document.getElementById(\"fabricExplain\"); FABRICS.forEach(f=>{ const b=document.createElement(\"button\"); b.className=\"chip\"; b.textContent=f.t; b.addEventListener(\"click\",()=>{ if(chipsBox.dataset.done) return; chipsBox.dataset.done=\"1\"; [...chipsBox.children].forEach(c=>{ const fab=FABRICS.find(x=>x.t===c.textContent); if(fab.ok)c.classList.add(\"correct\"); else if(c===b)c.classList.add(\"wrong\"); }); fabExplain.innerHTML=FAB_NOTE; fabExplain.classList.add(\"show\"); say(\"cotton\"); }); chipsBox.appendChild(b); }); // sizes const sizesBox=document.getElementById(\"sizes\"), sizeNote=document.getElementById(\"sizeNote\"); const SIZE_VI={S:\"small (nhỏ)\",M:\"medium (vừa)\",L:\"large (rộng)\",XL:\"extra large (rất rộng)\"}; SIZES.forEach(s=>{ const b=document.createElement(\"button\"); b.className=\"size\"; b.textContent=s; b.addEventListener(\"click\",()=>{ [...sizesBox.children].forEach(x=>x.classList.remove(\"sel\")); b.classList.add(\"sel\"); sizeNote.innerHTML=`${s} = ${SIZE_VI[s]}`; say(s+\", \"+s.replace(/./g,'')+SIZE_VI[s].split(\" \")[0]); }); sizesBox.appendChild(b); }); // phrases function fillPhrases(box, arr){ arr.forEach(p=>{ const el=document.createElement(\"div\"); el.className=\"pline\"; el.innerHTML=`🔊"
+                      - generic [ref=e71]: "${p.t}${p.vi}"
+                      - text: "`; el.addEventListener(\"click\",()=>say(p.t)); box.appendChild(el); }); } fillPhrases(document.getElementById(\"pg1\"), PH1); fillPhrases(document.getElementById(\"pg2\"), PH2); // scene const sceneBox=document.getElementById(\"scene\"), sceneHint=document.getElementById(\"sceneHint\"); let shown=0; SCENE.forEach(s=>{ const b=document.createElement(\"div\"); b.className=`bubble ${s.cls}`; b.innerHTML=`"
+                      - generic [ref=e72]: "${s.who===\"you\"?\"Bạn\":\"Nhân viên\"}"
+                      - generic [ref=e73]: "${s.en}"
+                      - generic [ref=e74]: "${s.vi}"
+                      - button "🔊 nghe" [ref=e75]
+                      - text: "`; b.querySelector(\".spk2\").addEventListener(\"click\",e=>{e.stopPropagation(); say(s.en);}); sceneBox.appendChild(b); }); function revealNext(){ if(shown>=SCENE.length) return; const b=sceneBox.children[shown]; b.classList.add(\"show\"); say(SCENE[shown].en); shown++; if(shown>=SCENE.length) sceneHint.textContent=\"✓ Hết hội thoại — bấm Tiếp để qua slide sau\"; } document.querySelectorAll(\".slide\")[6].addEventListener(\"click\", ev=>{ if(ev.target.closest(\".spk2\")) return; revealNext(); }); // AI voice const mic=document.getElementById(\"mic\"), micLabel=document.getElementById(\"micLabel\"), evalCard=document.getElementById(\"eval\"); document.getElementById(\"replay\").addEventListener(\"click\",()=>say(\"You need a shirt for a job interview. Ask the shop assistant for help.\")); let recording=false; mic.addEventListener(\"click\",()=>{ if(evalCard.classList.contains(\"show\")){ evalCard.classList.remove(\"show\"); micLabel.textContent=\"Bấm để nói\"; return; } recording=!recording; if(recording){ mic.classList.add(\"rec\"); mic.textContent=\"⏹\"; micLabel.innerHTML=`"
+                      - text: "`; } else { mic.classList.remove(\"rec\"); mic.textContent=\"🎙️\"; micLabel.textContent=\"AI đang chấm…\"; setTimeout(()=>{ micLabel.textContent=\"Bạn nói: “Hi, I'm looking for a shirt for an interview.”\"; evalCard.classList.add(\"show\"); },900); } }); // deck nav const slides=[...document.querySelectorAll(\".slide\")], dotsBox=document.getElementById(\"dots\"), counter=document.getElementById(\"counter\"), prev=document.getElementById(\"prev\"), next=document.getElementById(\"next\"); let i=0; slides.forEach((_,idx)=>{ const d=document.createElement(\"button\"); d.setAttribute(\"aria-label\",\"Slide \"+(idx+1)); d.addEventListener(\"click\",()=>go(idx)); dotsBox.appendChild(d); }); function go(n){ i=Math.max(0,Math.min(slides.length-1,n)); slides.forEach((s,idx)=>s.classList.toggle(\"on\",idx===i)); [...dotsBox.children].forEach((d,idx)=>{ d.classList.toggle(\"active\",idx===i); d.classList.toggle(\"done\",idx"
+                      - generic [ref=e83]: "{ if(igo(i-1)); document.addEventListener(\"keydown\",e=>{ if(e.key===\"ArrowRight\")go(i+1); if(e.key===\"ArrowLeft\")go(i-1); }); go(0);"
