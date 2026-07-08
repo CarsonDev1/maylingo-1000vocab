@@ -181,3 +181,36 @@ export async function confirmDailyGoal(goal: number): Promise<{ ok: true }> {
   revalidatePath("/dashboard");
   return { ok: true };
 }
+
+/**
+ * Mark a topic day complete: record progress (best avg voice score), award XP,
+ * touch the streak. Revalidates sibling paths only — NOT /topics/[day] — so the
+ * deck's finish screen is not replaced by a refetch.
+ */
+export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{ xpEarned: number }> {
+  const userId = await requireUserId();
+  const db = getSupabaseAdmin();
+
+  const clean = scores.filter((s) => Number.isFinite(s)).map((s) => Math.min(100, Math.max(0, Math.round(s))));
+  const avg = clean.length ? Math.round(clean.reduce((a, b) => a + b, 0) / clean.length) : null;
+  const xpEarned = 30 + clean.length * 5;
+
+  const { data: prev } = await db
+    .from("user_topic_progress")
+    .select("best_score")
+    .eq("user_id", userId)
+    .eq("day_no", dayNo)
+    .maybeSingle();
+  const bestScore = avg == null ? (prev?.best_score ?? null) : Math.max(avg, prev?.best_score ?? 0);
+
+  await db.from("user_topic_progress").upsert(
+    { user_id: userId, day_no: dayNo, completed_at: new Date().toISOString(), best_score: bestScore },
+    { onConflict: "user_id,day_no" },
+  );
+  await bumpActivity(userId, { xp: xpEarned });
+  await touchStreak(userId);
+
+  revalidatePath("/topics");
+  revalidatePath("/dashboard");
+  return { xpEarned };
+}
