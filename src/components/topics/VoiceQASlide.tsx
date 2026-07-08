@@ -23,6 +23,9 @@ export function VoiceQASlide({ slide, dayNo, onDone }: { slide: VoiceQaSlide; da
   // Read the question aloud once on mount.
   useEffect(() => {
     speakText(slide.question_en);
+    return () => {
+      if (isTtsSupported()) window.speechSynthesis.cancel();
+    };
   }, [slide.question_en]);
 
   // Mic transcript fills the editable answer box.

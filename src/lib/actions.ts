@@ -189,6 +189,7 @@ export async function confirmDailyGoal(goal: number): Promise<{ ok: true }> {
  */
 export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{ xpEarned: number }> {
   const userId = await requireUserId();
+  if (!Number.isInteger(dayNo) || dayNo < 1 || dayNo > 30) return { xpEarned: 0 };
   const db = getSupabaseAdmin();
 
   const clean = scores.filter((s) => Number.isFinite(s)).map((s) => Math.min(100, Math.max(0, Math.round(s))));
