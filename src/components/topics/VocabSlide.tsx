@@ -15,7 +15,7 @@ export function VocabSlide({ slide, words, onDone }: { slide: VocabTopicSlide; w
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col">
-      <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Chạm vào thẻ để mở nghĩa</p>
+      <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Tap a card to reveal its meaning</p>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cards.map((w, i) => {
           const isOpen = !!open[w.id];
@@ -36,7 +36,7 @@ export function VocabSlide({ slide, words, onDone }: { slide: VocabTopicSlide; w
                 tabIndex={0}
                 onClick={(e) => { e.stopPropagation(); setOpen((o) => ({ ...o, [w.id]: true })); speakText(w.term); }}
                 className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg bg-white text-green-600 shadow"
-                aria-label={`Nghe ${w.term}`}
+                aria-label={`Listen to ${w.term}`}
               >
                 <Volume2 className="h-3.5 w-3.5" />
               </span>
@@ -51,7 +51,7 @@ export function VocabSlide({ slide, words, onDone }: { slide: VocabTopicSlide; w
           );
         })}
       </div>
-      <Button variant="primary" className="mt-6 w-full" onClick={() => onDone()}>Tiếp tục</Button>
+      <Button variant="primary" className="mt-6 w-full" onClick={() => onDone()}>Continue</Button>
     </div>
   );
 }

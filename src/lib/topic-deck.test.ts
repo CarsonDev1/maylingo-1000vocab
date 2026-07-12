@@ -4,17 +4,17 @@ import { normalizeSlides, isDayUnlocked } from "@/lib/topic-deck";
 describe("normalizeSlides", () => {
   test("keeps one valid slide of each type, drops malformed", () => {
     const raw = [
-      { type: "cover", hero_word_id: 5, goal_en: "G", goal_vi: "Gvi" },
+      { type: "cover", hero_word_id: 5, goal_en: "G" },
       { type: "vocab", word_ids: [1, 2, 3] },
       { type: "vocab", word_ids: [] },                 // empty -> dropped
       { type: "example", word_id: 7 },
       { type: "example" },                              // no word_id -> dropped
-      { type: "attribute", word_id: null, prompt_en: "P", prompt_vi: "V",
-        options: [{ label: "a", correct: true }, { label: "b", correct: false }], explain_vi: "x" },
+      { type: "attribute", word_id: null, prompt_en: "P",
+        options: [{ label: "a", correct: true }, { label: "b", correct: false }], explain_en: "x" },
       { type: "attribute", prompt_en: "no opts" },      // dropped
-      { type: "dialogue", title_en: "T", lines: [{ who: "a", en: "hi", vi: "chào" }] },
+      { type: "dialogue", title_en: "T", lines: [{ who: "a", en: "hi" }] },
       { type: "dialogue", title_en: "T", lines: [] },   // no lines -> dropped
-      { type: "voice_qa", question_en: "Q", question_vi: "Qv", key_points: ["a"], sample_answer_en: "s" },
+      { type: "voice_qa", question_en: "Q", key_points: ["a"], sample_answer_en: "s" },
       { type: "recap" },
       { type: "nonsense" },                             // dropped
       "garbage",                                        // dropped
@@ -31,8 +31,8 @@ describe("normalizeSlides", () => {
 
   test("attribute needs >=2 options incl. a correct one", () => {
     expect(normalizeSlides([
-      { type: "attribute", word_id: null, prompt_en: "P", prompt_vi: "V",
-        options: [{ label: "a", correct: false }], explain_vi: null },
+      { type: "attribute", word_id: null, prompt_en: "P",
+        options: [{ label: "a", correct: false }], explain_en: null },
     ])).toEqual([]);
   });
 

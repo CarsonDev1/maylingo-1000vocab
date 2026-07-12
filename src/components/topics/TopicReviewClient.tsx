@@ -48,9 +48,9 @@ export function TopicReviewClient() {
     return (
       <div className="mx-auto max-w-md px-4 py-10 text-center">
         <p className="text-5xl">✅</p>
-        <h2 className="mt-3 text-xl font-bold text-neutral-800">{done ? "Ôn xong!" : "Chưa có từ đến hạn ôn"}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{done ? `Bạn đã ôn ${queue.length} từ.` : "Học thêm một ngày trong lộ trình để có từ ôn."}</p>
-        <Button asChild variant="secondary" className="mt-6"><Link href="/topics">Về lộ trình</Link></Button>
+        <h2 className="mt-3 text-xl font-bold text-neutral-800">{done ? "Review complete!" : "No words due for review yet"}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{done ? `You reviewed ${queue.length} word${queue.length === 1 ? "" : "s"}.` : "Learn another day in the path to get review words."}</p>
+        <Button asChild variant="secondary" className="mt-6"><Link href="/topics">Back to path</Link></Button>
       </div>
     );
   }
@@ -76,7 +76,7 @@ export function TopicReviewClient() {
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col gap-5 px-4 py-6">
       <div className="flex items-center justify-between text-sm font-bold text-muted-foreground">
-        <Link href="/topics" className="hover:text-neutral-700">✕ Thoát</Link>
+        <Link href="/topics" className="hover:text-neutral-700">Exit</Link>
         <span className="tabular-nums">{i + 1}/{queue.length}</span>
       </div>
 
@@ -84,14 +84,14 @@ export function TopicReviewClient() {
         <Image src={word!.image_url} alt="" width={200} height={150} unoptimized className="mx-auto h-36 w-auto rounded-2xl object-contain" />
       )}
       <p className="rounded-xl border-2 bg-slate-50 p-4 text-center text-lg italic text-neutral-800">“{prompt}”</p>
-      <p className="text-center text-sm text-muted-foreground">Nhớ lại từ còn thiếu:</p>
+      <p className="text-center text-sm text-muted-foreground">Recall the missing word:</p>
 
       {result === null ? (
         <>
           <Input autoFocus value={typed} onChange={(e) => setTyped(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") check(); }}
-            placeholder="Gõ từ tiếng Anh…" className="h-14 text-center text-xl" />
-          <Button variant="primary" className="w-full" disabled={!typed.trim()} onClick={check}>Kiểm tra</Button>
+            placeholder="Type the English word…" className="h-14 text-center text-xl" />
+          <Button variant="primary" className="w-full" disabled={!typed.trim()} onClick={check}>Check</Button>
         </>
       ) : (
         <div className="flex flex-col gap-3">
@@ -102,7 +102,7 @@ export function TopicReviewClient() {
             {word!.meaning_vi ? <span className="font-normal text-muted-foreground">· {word!.meaning_vi}</span> : null}
           </div>
           {word!.example_en && <p className="rounded-xl border-2 bg-slate-50 p-3 text-sm italic text-neutral-700">“{word!.example_en}”</p>}
-          <Button variant="primary" className="w-full" onClick={next}>Tiếp tục</Button>
+          <Button variant="primary" className="w-full" onClick={next}>Continue</Button>
         </div>
       )}
     </div>

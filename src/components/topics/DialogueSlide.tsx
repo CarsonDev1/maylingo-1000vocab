@@ -33,17 +33,16 @@ export function DialogueSlide({ slide, onDone }: { slide: DialogueTopicSlide; on
             )}
           >
             <p className="font-semibold text-neutral-800">{l.en}</p>
-            <p className="text-xs text-muted-foreground">{l.vi}</p>
-            <button onClick={() => speakText(l.en)} className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-green-600" aria-label="Nghe">
-              <Volume2 className="h-3.5 w-3.5" /> nghe
+            <button onClick={() => speakText(l.en)} className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-green-600" aria-label="Listen">
+              <Volume2 className="h-3.5 w-3.5" /> listen
             </button>
           </motion.div>
         ))}
       </div>
       {all ? (
-        <Button variant="primary" className="w-full" onClick={() => onDone()}>Tiếp tục</Button>
+        <Button variant="primary" className="w-full" onClick={() => onDone()}>Continue</Button>
       ) : (
-        <Button variant="ghost" className="w-full" onClick={next}>Câu tiếp theo →</Button>
+        <Button variant="ghost" className="w-full" onClick={next}>Next line →</Button>
       )}
     </div>
   );

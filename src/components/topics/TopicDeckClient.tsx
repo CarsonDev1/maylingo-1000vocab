@@ -19,8 +19,8 @@ export function TopicDeckClient({ day }: { day: number }) {
     let cancelled = false;
     fetch(`/api/topics/${day}`)
       .then(async (r) => {
-        if (r.status === 403) return { _err: "Ngày này chưa mở khóa. Hãy hoàn thành ngày trước đó." };
-        if (!r.ok) return { _err: "Không tải được nội dung ngày này." };
+        if (r.status === 403) return { _err: "This day is locked. Complete the previous day first." };
+        if (!r.ok) return { _err: "Couldn't load this day." };
         return r.json();
       })
       .then((d) => {
@@ -29,7 +29,7 @@ export function TopicDeckClient({ day }: { day: number }) {
         else setState({ status: "ready", deck: d.deck as TopicDeck, words: (d.words as Word[]) ?? [] });
       })
       .catch(() => {
-        if (!cancelled) setState({ status: "error", message: "Không kết nối được." });
+        if (!cancelled) setState({ status: "error", message: "Couldn't connect." });
       });
     return () => {
       cancelled = true;
@@ -49,7 +49,7 @@ export function TopicDeckClient({ day }: { day: number }) {
         <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
           <p className="text-white">{state.message}</p>
           <Button asChild variant="secondary" className="mt-5">
-            <Link href="/topics">Về lộ trình</Link>
+            <Link href="/topics">Back to path</Link>
           </Button>
         </div>
       </div>

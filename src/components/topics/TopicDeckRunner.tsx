@@ -54,7 +54,7 @@ export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[
         <div className="mx-auto w-full max-w-md px-6 text-center">
           <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
             <Image src="/finish.svg" width={90} height={90} alt="" className="mx-auto" />
-            <h2 className="mt-4 text-2xl font-bold text-white">Hoàn thành ngày {deck.day_no}!</h2>
+            <h2 className="mt-4 text-2xl font-bold text-white">Day {deck.day_no} complete!</h2>
             <p className="mt-1 text-neutral-300">{deck.title_en}</p>
             <div className="mt-6 rounded-xl border-2 border-orange-400/60 bg-orange-400/10 p-4">
               <p className="text-2xl font-bold text-orange-400">+{xp}</p>
@@ -62,7 +62,7 @@ export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[
             </div>
             <div className="mt-6 flex flex-col gap-2">
               <Button asChild variant="secondary">
-                <Link href="/topics">Về lộ trình</Link>
+                <Link href="/topics">Back to path</Link>
               </Button>
             </div>
           </div>
@@ -123,9 +123,9 @@ function Empty() {
   return (
     <div className="mx-auto max-w-md px-6 text-center">
       <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
-        <h2 className="text-xl font-bold text-white">Chưa có nội dung cho ngày này</h2>
+        <h2 className="text-xl font-bold text-white">No content for this day yet</h2>
         <Button asChild variant="secondary" className="mt-6">
-          <Link href="/topics">Về lộ trình</Link>
+          <Link href="/topics">Back to path</Link>
         </Button>
       </div>
     </div>

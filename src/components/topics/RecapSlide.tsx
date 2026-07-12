@@ -5,10 +5,10 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function RecapSlide({ title, onDone }: { title: string; onDone: (score?: number) => void }) {
-  const items = ["Từ vựng chủ đề + hình ảnh", "Câu ví dụ thực tế", "Điểm ngữ pháp/ngữ cảnh", "Luyện nói với AI"];
+  const items = ["Topic vocabulary + images", "Real-life example sentences", "Grammar/context notes", "AI speaking practice"];
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-4 text-center">
-      <h2 className="text-2xl font-extrabold text-neutral-800">Hoàn thành: {title} 🎉</h2>
+      <h2 className="text-2xl font-extrabold text-neutral-800">Completed: {title} 🎉</h2>
       <div className="flex flex-col gap-2 text-left">
         {items.map((t, i) => (
           <motion.div key={t} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
@@ -18,7 +18,7 @@ export function RecapSlide({ title, onDone }: { title: string; onDone: (score?: 
           </motion.div>
         ))}
       </div>
-      <Button variant="primary" className="w-full" onClick={() => onDone()}>Xong</Button>
+      <Button variant="primary" className="w-full" onClick={() => onDone()}>Done</Button>
     </div>
   );
 }

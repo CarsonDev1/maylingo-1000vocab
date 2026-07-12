@@ -38,9 +38,8 @@ function normalizeLines(input: unknown): DialogueLine[] {
     if (!item || typeof item !== "object") continue;
     const o = item as Record<string, unknown>;
     const en = cleanString(o.en);
-    const vi = cleanString(o.vi);
-    if (!en || !vi) continue;
-    out.push({ who: o.who === "b" ? "b" : "a", en, vi });
+    if (!en) continue;
+    out.push({ who: o.who === "b" ? "b" : "a", en });
     if (out.length === 6) break;
   }
   return out;
@@ -55,7 +54,6 @@ function normalizeSlide(raw: unknown): TopicSlide | null {
         type: "cover",
         hero_word_id: typeof o.hero_word_id === "number" ? o.hero_word_id : null,
         goal_en: cleanString(o.goal_en),
-        goal_vi: cleanString(o.goal_vi),
       };
     case "vocab": {
       const word_ids = numberArray(o.word_ids);
@@ -65,13 +63,12 @@ function normalizeSlide(raw: unknown): TopicSlide | null {
       return typeof o.word_id === "number" ? { type: "example", word_id: o.word_id } : null;
     case "attribute": {
       const prompt_en = cleanString(o.prompt_en);
-      const prompt_vi = cleanString(o.prompt_vi);
       const options = normalizeOptions(o.options);
-      if (!prompt_en || !prompt_vi || options.length < 2 || !options.some((x) => x.correct)) return null;
+      if (!prompt_en || options.length < 2 || !options.some((x) => x.correct)) return null;
       return {
         type: "attribute",
         word_id: typeof o.word_id === "number" ? o.word_id : null,
-        prompt_en, prompt_vi, options, explain_vi: cleanString(o.explain_vi),
+        prompt_en, options, explain_en: cleanString(o.explain_en),
       };
     }
     case "dialogue": {
@@ -81,11 +78,10 @@ function normalizeSlide(raw: unknown): TopicSlide | null {
     }
     case "voice_qa": {
       const question_en = cleanString(o.question_en);
-      const question_vi = cleanString(o.question_vi);
-      if (!question_en || !question_vi) return null;
+      if (!question_en) return null;
       return {
         type: "voice_qa",
-        question_en, question_vi,
+        question_en,
         key_points: normalizeStrings(o.key_points, 5),
         sample_answer_en: cleanString(o.sample_answer_en),
       };

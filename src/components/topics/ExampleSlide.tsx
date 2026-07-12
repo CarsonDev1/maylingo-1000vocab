@@ -9,7 +9,7 @@ import type { ExampleTopicSlide, Word } from "@/types";
 
 export function ExampleSlide({ slide, words, onDone }: { slide: ExampleTopicSlide; words: Word[]; onDone: (score?: number) => void }) {
   const w = words.find((x) => x.id === slide.word_id);
-  if (!w) return <div className="text-center"><Button variant="primary" onClick={() => onDone()}>Tiếp tục</Button></div>;
+  if (!w) return <div className="text-center"><Button variant="primary" onClick={() => onDone()}>Continue</Button></div>;
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 text-center">
       <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}>
@@ -20,18 +20,18 @@ export function ExampleSlide({ slide, words, onDone }: { slide: ExampleTopicSlid
         )}
       </motion.div>
       <div>
-        <button onClick={() => speakText(w.term)} className="inline-flex items-center gap-2 text-xl font-extrabold text-neutral-800" aria-label={`Nghe ${w.term}`}>
+        <button onClick={() => speakText(w.term)} className="inline-flex items-center gap-2 text-xl font-extrabold text-neutral-800" aria-label={`Listen to ${w.term}`}>
           {w.term} <Volume2 className="h-4 w-4 text-green-600" />
         </button>
         {w.meaning_vi && <p className="text-sm text-muted-foreground">{w.meaning_vi}</p>}
       </div>
       {w.example_en && (
-        <button onClick={() => speakText(w.example_en!)} className="rounded-xl border-2 bg-slate-50 p-3 text-left" aria-label="Nghe câu ví dụ">
+        <button onClick={() => speakText(w.example_en!)} className="rounded-xl border-2 bg-slate-50 p-3 text-left" aria-label="Play example sentence">
           <p className="italic text-neutral-800">“{w.example_en}”</p>
-          <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-green-600"><Volume2 className="h-3.5 w-3.5" /> Nghe câu</span>
+          <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-green-600"><Volume2 className="h-3.5 w-3.5" /> Listen</span>
         </button>
       )}
-      <Button variant="primary" className="w-full" onClick={() => onDone()}>Tiếp tục</Button>
+      <Button variant="primary" className="w-full" onClick={() => onDone()}>Continue</Button>
     </div>
   );
 }

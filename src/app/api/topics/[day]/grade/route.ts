@@ -3,7 +3,7 @@ import { requireUserId } from "@/lib/auth";
 
 interface GradeResult {
   score: number;
-  feedback_vi: string;
+  feedback: string;
   covered: string[];
 }
 
@@ -13,20 +13,20 @@ async function gradeWithGroq(questionEn: string, keyPoints: string[], answer: st
   if (!apiKey) throw new Error("GROQ_API_KEY not configured");
 
   const system =
-    "Bạn là giáo viên tiếng Anh giao tiếp cho một software engineer người Việt muốn làm việc ở công ty đa quốc gia. " +
-    "Đây là BẢN CHÉP LỜI NÓI (speech-to-text) nên có thể thiếu dấu câu — ĐỪNG soi lỗi dấu câu/viết hoa. " +
-    "Chấm theo mức độ trả lời đúng trọng tâm, tự nhiên, đủ ý. Trả lời ONLY bằng valid JSON.";
-  const user = `Câu hỏi: "${questionEn}"
-Các ý nên có trong câu trả lời: ${keyPoints.length ? keyPoints.join("; ") : "(không có)"}
-Câu trả lời của học viên (đã chép lại):
+    "You are an English communication coach for a Vietnamese software engineer who wants to work at a multinational company. " +
+    "This is a SPEECH-TO-TEXT TRANSCRIPT so it may be missing punctuation/capitalization — DO NOT penalize that. " +
+    "Grade based on how on-topic, natural, and complete the answer is. Reply ONLY with valid JSON, entirely in English.";
+  const user = `Question: "${questionEn}"
+Key points the answer should ideally cover: ${keyPoints.length ? keyPoints.join("; ") : "(none)"}
+Learner's answer (transcribed from speech):
 """
 ${answer}
 """
-Trả về JSON:
+Return JSON:
 {
-  "score": <số nguyên 0-100: mức độ trả lời tốt, tự nhiên, đủ ý>,
-  "covered": <mảng các ý (lấy nguyên văn từ danh sách trên) mà câu trả lời ĐÃ đề cập>,
-  "feedback_vi": <nhận xét TIẾNG VIỆT 3-5 câu: (1) khen điểm tốt; (2) chỗ diễn đạt chưa tự nhiên + cách nói hay hơn (kèm 1 mẫu câu tiếng Anh); (3) động viên>
+  "score": <integer 0-100: how good, natural, and complete the answer is>,
+  "covered": <array of key points (verbatim from the list above) that the answer DID cover>,
+  "feedback": <3-5 sentences of ENGLISH feedback: (1) praise what was good; (2) point out anything unnatural + a better way to say it (include one English example sentence); (3) encouragement>
 }`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -75,15 +75,15 @@ export async function POST(req: Request, { params }: { params: { day: string } }
     result = {
       score: Math.min(100, 50 + covered.length * 15),
       covered,
-      feedback_vi: "Đã ghi nhận câu trả lời của bạn! Cứ luyện nói đều đặn, cố gắng nói đủ ý và tự nhiên hơn nhé.",
+      feedback: "Your answer has been recorded! Keep practicing regularly, and try to be more complete and natural.",
     };
   }
 
   const score = Math.min(100, Math.max(0, Math.round(Number(result.score) || 0)));
   const covered = Array.isArray(result.covered) ? result.covered.filter((c) => typeof c === "string") : [];
-  const feedbackVi = typeof result.feedback_vi === "string" && result.feedback_vi.trim()
-    ? result.feedback_vi.trim()
-    : "Câu trả lời tốt! Tiếp tục luyện nói nhé.";
+  const feedback = typeof result.feedback === "string" && result.feedback.trim()
+    ? result.feedback.trim()
+    : "Good answer! Keep practicing your speaking.";
 
-  return NextResponse.json({ score, feedbackVi, covered });
+  return NextResponse.json({ score, feedback, covered });
 }
