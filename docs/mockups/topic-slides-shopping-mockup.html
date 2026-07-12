@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Maylingo · Slide tương tác (mockup) — Shopping</title>
 <style>
   :root {
@@ -190,6 +195,8 @@
   .caption { width: 100%; max-width: 1000px; text-align: center; color: var(--muted); font-size: 12px; }
   :focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: 2px; }
 </style>
+</head>
+<body>
 
 <div class="app">
   <div class="bar">
@@ -397,7 +404,7 @@
 
   // scene: person entering store
   document.getElementById("art-enter").innerHTML = svg("0 0 240 200", `
-    <rect x="18" y="26" width="128" height="150" rx="8" class="ink" fill="${P.surface}"/>
+    <rect x="18" y="26" width="128" height="150" rx="8" class="ink" fill="${P.white}"/>
     <path class="ink" d="M18 52 H146" /><rect x="30" y="14" width="104" height="16" rx="6" fill="${P.greenSoft}" class="ink"/>
     <path class="ink-thin" d="M82 52 V176 M40 78 h30 M40 96 h30 M96 78 h30 M96 96 h30"/>
     <g transform="translate(168 78)">
@@ -422,7 +429,7 @@
 
   // fitting room scene
   document.getElementById("art-fitting").innerHTML = svg("0 0 220 220", `
-    <rect x="30" y="30" width="160" height="170" rx="10" class="ink" fill="${P.surface}"/>
+    <rect x="30" y="30" width="160" height="170" rx="10" class="ink" fill="${P.white}"/>
     <path class="ink" d="M110 30 V200"/>
     <path class="ink" d="M40 44 H100" /><path class="ink" d="M46 44 q10 40 0 90 q-6 10 -14 0 q10 -50 0 -90" fill="${P.sky}"/>
     <path class="ink" d="M60 44 q-10 40 0 90 q6 10 14 0 q-10 -50 0 -90" fill="${P.sky}" fill-opacity=".6"/>
@@ -519,3 +526,5 @@
   document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight")go(i+1); if(e.key==="ArrowLeft")go(i-1); });
   go(0);
 </script>
+</body>
+</html>
