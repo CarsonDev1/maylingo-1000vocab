@@ -143,3 +143,76 @@ export interface AnswerResult {
   wordId: number;
   correct: boolean;
 }
+
+// ── 30-day topic program ────────────────────────────────────────────────────
+export interface AttributeOption {
+  label: string;
+  correct: boolean;
+}
+export interface CoverTopicSlide {
+  type: "cover";
+  hero_word_id: number | null;
+  goal_en: string | null;
+  goal_vi: string | null;
+}
+export interface VocabTopicSlide {
+  type: "vocab";
+  word_ids: number[];
+}
+export interface ExampleTopicSlide {
+  type: "example";
+  word_id: number;
+}
+export interface AttributeTopicSlide {
+  type: "attribute";
+  word_id: number | null;
+  prompt_en: string;
+  prompt_vi: string;
+  options: AttributeOption[];
+  explain_vi: string | null;
+}
+export interface DialogueLine {
+  who: "a" | "b";
+  en: string;
+  vi: string;
+}
+export interface DialogueTopicSlide {
+  type: "dialogue";
+  title_en: string;
+  lines: DialogueLine[];
+}
+export interface VoiceQaTopicSlide {
+  type: "voice_qa";
+  question_en: string;
+  question_vi: string;
+  key_points: string[];
+  sample_answer_en: string | null;
+}
+export interface RecapTopicSlide {
+  type: "recap";
+}
+export type TopicSlide =
+  | CoverTopicSlide
+  | VocabTopicSlide
+  | ExampleTopicSlide
+  | AttributeTopicSlide
+  | DialogueTopicSlide
+  | VoiceQaTopicSlide
+  | RecapTopicSlide;
+
+export interface TopicDeck {
+  day_no: number;
+  lesson_id: number;
+  title_en: string | null;
+  title_vi: string | null;
+  slides: TopicSlide[];
+}
+export interface TopicDaySummary {
+  day_no: number;
+  lesson_id: number;
+  title_en: string | null;
+  title_vi: string | null;
+  unlocked: boolean;
+  completed: boolean;
+  best_score: number | null;
+}

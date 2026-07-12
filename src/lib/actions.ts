@@ -38,6 +38,25 @@ function rowToState(p: WordProgress): SrsState {
   };
 }
 
+function srsToTopicRow(userId: string, wordId: number, s: SrsState) {
+  return {
+    user_id: userId, word_id: wordId,
+    proficiency: s.proficiency, memory_level: s.memoryLevel, ease: s.ease,
+    interval_days: s.intervalDays, due_at: s.dueAt, last_reviewed_at: s.lastReviewedAt,
+    correct_count: s.correctCount, wrong_count: s.wrongCount, status: s.status,
+    first_learned_at: s.firstLearnedAt,
+  };
+}
+function topicRowToSrs(p: Record<string, unknown>): SrsState {
+  return {
+    proficiency: p.proficiency as number, memoryLevel: p.memory_level as number, ease: p.ease as number,
+    intervalDays: p.interval_days as number, dueAt: (p.due_at as string) ?? null,
+    lastReviewedAt: (p.last_reviewed_at as string) ?? null, correctCount: p.correct_count as number,
+    wrongCount: p.wrong_count as number, status: (p.status as "active" | "inactive"),
+    firstLearnedAt: (p.first_learned_at as string) ?? null,
+  };
+}
+
 async function bumpActivity(userId: string, delta: { learned?: number; reviewed?: number; xp?: number }) {
   const db = getSupabaseAdmin();
   const date = todayStr();
@@ -178,6 +197,83 @@ export async function confirmDailyGoal(goal: number): Promise<{ ok: true }> {
   const settings = { ...((s?.settings as Record<string, unknown> | null) ?? {}), goalDate: today };
   await db.from("user_settings").upsert({ user_id: userId, settings });
 
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+/**
+ * Mark a topic day complete: record progress (best avg voice score), award XP,
+ * touch the streak. Revalidates sibling paths only — NOT /topics/[day] — so the
+ * deck's finish screen is not replaced by a refetch.
+ */
+export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{ xpEarned: number }> {
+  const userId = await requireUserId();
+  if (!Number.isInteger(dayNo) || dayNo < 1 || dayNo > 30) return { xpEarned: 0 };
+  const db = getSupabaseAdmin();
+
+  const clean = scores.filter((s) => Number.isFinite(s)).map((s) => Math.min(100, Math.max(0, Math.round(s))));
+  const avg = clean.length ? Math.round(clean.reduce((a, b) => a + b, 0) / clean.length) : null;
+  const xpEarned = 30 + clean.length * 5;
+
+  const { data: prev } = await db
+    .from("user_topic_progress")
+    .select("best_score")
+    .eq("user_id", userId)
+    .eq("day_no", dayNo)
+    .maybeSingle();
+  const bestScore = avg == null ? (prev?.best_score ?? null) : Math.max(avg, prev?.best_score ?? 0);
+
+  await db.from("user_topic_progress").upsert(
+    { user_id: userId, day_no: dayNo, completed_at: new Date().toISOString(), best_score: bestScore },
+    { onConflict: "user_id,day_no" },
+  );
+
+  // Enroll this day's words into the separate topic SRS schedule (skip already enrolled).
+  const { data: dayRow } = await db.from("topic_days").select("lesson_id").eq("day_no", dayNo).maybeSingle();
+  if (dayRow?.lesson_id != null) {
+    const { data: lessonWords } = await db.from("words").select("id").eq("lesson_id", dayRow.lesson_id);
+    const ids = ((lessonWords as { id: number }[]) ?? []).map((w) => w.id);
+    if (ids.length) {
+      const { data: existing } = await db.from("user_topic_srs").select("word_id").eq("user_id", userId).in("word_id", ids);
+      const have = new Set(((existing as { word_id: number }[]) ?? []).map((e) => e.word_id));
+      const fresh = ids.filter((id) => !have.has(id));
+      if (fresh.length) {
+        const now = new Date();
+        await db.from("user_topic_srs").upsert(fresh.map((id) => srsToTopicRow(userId, id, scheduleNew(now))), { onConflict: "user_id,word_id" });
+      }
+    }
+  }
+
+  await bumpActivity(userId, { xp: xpEarned });
+  await touchStreak(userId);
+
+  revalidatePath("/topics");
+  revalidatePath("/topics/review");
+  revalidatePath("/dashboard");
+  return { xpEarned };
+}
+
+/** Apply one topic-review answer, updating the separate topic SRS schedule. */
+export async function submitTopicReview(wordId: number, correct: boolean): Promise<{ ok: true }> {
+  const userId = await requireUserId();
+  const db = getSupabaseAdmin();
+  const now = new Date();
+  const { data } = await db.from("user_topic_srs").select("*").eq("user_id", userId).eq("word_id", wordId).maybeSingle();
+  const prev: SrsState = data ? topicRowToSrs(data as Record<string, unknown>) : scheduleNew(now);
+  const next = data ? reviewWord(prev, { correct }, now) : prev;
+  await db.from("user_topic_srs").upsert(srsToTopicRow(userId, wordId, next), { onConflict: "user_id,word_id" });
+  return { ok: true };
+}
+
+/** Record a finished topic-review session: activity + streak. */
+export async function finishTopicReview(reviewed: number, correct: number): Promise<{ ok: true }> {
+  const userId = await requireUserId();
+  if (reviewed > 0) {
+    await bumpActivity(userId, { reviewed, xp: correct * 5 });
+    await touchStreak(userId);
+  }
+  revalidatePath("/topics");
+  revalidatePath("/topics/review");
   revalidatePath("/dashboard");
   return { ok: true };
 }
