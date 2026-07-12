@@ -37,8 +37,10 @@ describe("normalizeSlides", () => {
   });
 
   test("vocab word_ids are coerced to a clean number array", () => {
-    const out = normalizeSlides([{ type: "vocab", word_ids: [1, "x", 2, 2.0] }]) as any;
-    expect(out[0].word_ids).toEqual([1, 2, 2]);
+    const out = normalizeSlides([{ type: "vocab", word_ids: [1, "x", 2, 2.0] }]);
+    const first = out[0];
+    expect(first?.type).toBe("vocab");
+    if (first && first.type === "vocab") expect(first.word_ids).toEqual([1, 2, 2]);
   });
 });
 
