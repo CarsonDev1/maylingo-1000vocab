@@ -17,7 +17,6 @@ export function AttributeSlide({ slide, words, onDone }: { slide: AttributeTopic
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4">
       {w?.image_url && <Image src={w.image_url} alt="" width={140} height={110} unoptimized className="h-28 w-auto rounded-2xl object-contain" />}
       <p className="text-center text-lg font-semibold text-neutral-800">{slide.prompt_en}</p>
-      <p className="text-center text-sm text-muted-foreground">{slide.prompt_vi}</p>
       <div className="grid w-full gap-3">
         {slide.options.map((opt, i) => (
           <button
@@ -40,8 +39,8 @@ export function AttributeSlide({ slide, words, onDone }: { slide: AttributeTopic
       </div>
       {revealed && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
-          {slide.explain_vi && <p className="mb-3 rounded-xl bg-amber-500/10 p-3 text-sm text-neutral-800">{slide.explain_vi}</p>}
-          <Button variant="primary" className="w-full" onClick={() => onDone()}>Tiếp tục</Button>
+          {slide.explain_en && <p className="mb-3 rounded-xl bg-amber-500/10 p-3 text-sm text-neutral-800">{slide.explain_en}</p>}
+          <Button variant="primary" className="w-full" onClick={() => onDone()}>Continue</Button>
         </motion.div>
       )}
     </div>

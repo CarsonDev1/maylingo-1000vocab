@@ -45,7 +45,7 @@ export function TopicRoadmap() {
   if (days.length === 0) {
     return (
       <div className="mt-6 rounded-2xl border-2 border-dashed p-8 text-center text-sm text-muted-foreground">
-        Chưa có nội dung lộ trình. (Chạy <code>node scripts/generate-topic-decks.mjs</code> để tạo.)
+        No path content yet. (Run <code>node scripts/generate-topic-decks.mjs</code> to generate it.)
       </div>
     );
   }
@@ -60,7 +60,7 @@ export function TopicRoadmap() {
           className="mb-5 flex items-center justify-between rounded-2xl border-b-4 border-green-600 bg-green-500 px-5 py-4 font-bold text-white shadow-sm transition hover:bg-green-600 active:border-b-2"
         >
           <span>
-            Hôm nay · Ngày {nextDay.day_no}: {nextDay.title_en}
+            Today · Day {nextDay.day_no}: {nextDay.title_en}
           </span>
           <Play className="h-5 w-5 shrink-0 fill-white" />
         </Link>
@@ -71,7 +71,7 @@ export function TopicRoadmap() {
           href="/topics/review"
           className="mb-4 flex items-center justify-between rounded-2xl border-b-4 border-orange-500 bg-orange-400 px-5 py-4 font-bold text-white shadow-sm transition hover:bg-orange-500 active:border-b-2"
         >
-          <span>⏰ Ôn tập · {review.dueCount} từ đến “Thời gian vàng”</span>
+          <span>⏰ Review · {review.dueCount} words due</span>
           <span aria-hidden>→</span>
         </Link>
       )}
@@ -100,7 +100,7 @@ export function TopicRoadmap() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-neutral-700">
-                  Ngày {d.day_no}: {d.title_en}
+                  Day {d.day_no}: {d.title_en}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">{d.title_vi}</p>
               </div>
