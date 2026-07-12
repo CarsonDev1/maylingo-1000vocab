@@ -102,7 +102,6 @@ export function TopicRoadmap() {
                 <p className="truncate font-bold text-neutral-700">
                   Day {d.day_no}: {d.title_en}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">{d.title_vi}</p>
               </div>
               {d.completed && d.best_score != null && (
                 <span className="shrink-0 text-xs font-bold text-green-600">{d.best_score}%</span>
