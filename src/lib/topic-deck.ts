@@ -1,13 +1,14 @@
-import type {
-  AttributeOption, AttributeSlide, TopicSlide, VocabSlide, VoiceQaSlide, Word,
-} from "@/types";
+import type { AttributeOption, DialogueLine, TopicSlide } from "@/types";
 
 function cleanString(v: unknown): string | null {
   if (typeof v !== "string") return null;
   const t = v.trim();
   return t.length > 0 ? t : null;
 }
-
+function numberArray(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter((n): n is number => typeof n === "number" && Number.isFinite(n));
+}
 function normalizeOptions(input: unknown): AttributeOption[] {
   if (!Array.isArray(input)) return [];
   const out: AttributeOption[] = [];
@@ -20,7 +21,6 @@ function normalizeOptions(input: unknown): AttributeOption[] {
   }
   return out;
 }
-
 function normalizeStrings(input: unknown, max: number): string[] {
   if (!Array.isArray(input)) return [];
   const out: string[] = [];
@@ -31,41 +31,67 @@ function normalizeStrings(input: unknown, max: number): string[] {
   }
   return out;
 }
+function normalizeLines(input: unknown): DialogueLine[] {
+  if (!Array.isArray(input)) return [];
+  const out: DialogueLine[] = [];
+  for (const item of input) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const en = cleanString(o.en);
+    const vi = cleanString(o.vi);
+    if (!en || !vi) continue;
+    out.push({ who: o.who === "b" ? "b" : "a", en, vi });
+    if (out.length === 6) break;
+  }
+  return out;
+}
 
 function normalizeSlide(raw: unknown): TopicSlide | null {
   if (!raw || typeof raw !== "object") return null;
   const o = raw as Record<string, unknown>;
   switch (o.type) {
+    case "cover":
+      return {
+        type: "cover",
+        hero_word_id: typeof o.hero_word_id === "number" ? o.hero_word_id : null,
+        goal_en: cleanString(o.goal_en),
+        goal_vi: cleanString(o.goal_vi),
+      };
     case "vocab": {
-      if (typeof o.word_id !== "number") return null;
-      const s: VocabSlide = { type: "vocab", word_id: o.word_id };
-      return s;
+      const word_ids = numberArray(o.word_ids);
+      return word_ids.length ? { type: "vocab", word_ids } : null;
     }
+    case "example":
+      return typeof o.word_id === "number" ? { type: "example", word_id: o.word_id } : null;
     case "attribute": {
       const prompt_en = cleanString(o.prompt_en);
       const prompt_vi = cleanString(o.prompt_vi);
       const options = normalizeOptions(o.options);
-      if (!prompt_en || !prompt_vi || options.length < 2) return null;
-      if (!options.some((x) => x.correct)) return null;
-      const s: AttributeSlide = {
+      if (!prompt_en || !prompt_vi || options.length < 2 || !options.some((x) => x.correct)) return null;
+      return {
         type: "attribute",
         word_id: typeof o.word_id === "number" ? o.word_id : null,
         prompt_en, prompt_vi, options, explain_vi: cleanString(o.explain_vi),
       };
-      return s;
+    }
+    case "dialogue": {
+      const title_en = cleanString(o.title_en) ?? "";
+      const lines = normalizeLines(o.lines);
+      return lines.length ? { type: "dialogue", title_en, lines } : null;
     }
     case "voice_qa": {
       const question_en = cleanString(o.question_en);
       const question_vi = cleanString(o.question_vi);
       if (!question_en || !question_vi) return null;
-      const s: VoiceQaSlide = {
+      return {
         type: "voice_qa",
         question_en, question_vi,
         key_points: normalizeStrings(o.key_points, 5),
         sample_answer_en: cleanString(o.sample_answer_en),
       };
-      return s;
     }
+    case "recap":
+      return { type: "recap" };
     default:
       return null;
   }
@@ -80,24 +106,6 @@ export function normalizeSlides(raw: unknown): TopicSlide[] {
     if (s) out.push(s);
   }
   return out;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-/** 4-option multiple choice for a vocab word: its term + 3 distractor terms. */
-export function buildVocabOptions(word: Word, pool: Word[]): { label: string; correct: boolean }[] {
-  const distractors = shuffle(
-    pool.filter((p) => p.id !== word.id && p.term && p.term !== word.term).map((p) => p.term),
-  ).slice(0, 3);
-  const options = [{ label: word.term, correct: true }, ...distractors.map((label) => ({ label, correct: false }))];
-  return shuffle(options);
 }
 
 /** Day 1 is always open; a later day opens once the previous day is completed. */
