@@ -8,6 +8,7 @@ import type { TopicDaySummary } from "@/types";
 
 export function TopicRoadmap() {
   const [days, setDays] = useState<TopicDaySummary[] | null>(null);
+  const [review, setReview] = useState<{ dueCount: number; nextDueAt: string | null } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,6 +23,15 @@ export function TopicRoadmap() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/topics/review")
+      .then((r) => (r.ok ? r.json() : { dueCount: 0, nextDueAt: null }))
+      .then((d) => { if (!cancelled) setReview({ dueCount: d.dueCount ?? 0, nextDueAt: d.nextDueAt ?? null }); })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   if (days === null) {
@@ -53,6 +63,16 @@ export function TopicRoadmap() {
             Hôm nay · Ngày {nextDay.day_no}: {nextDay.title_en}
           </span>
           <Play className="h-5 w-5 shrink-0 fill-white" />
+        </Link>
+      )}
+
+      {review && review.dueCount > 0 && (
+        <Link
+          href="/topics/review"
+          className="mb-4 flex items-center justify-between rounded-2xl border-b-4 border-orange-500 bg-orange-400 px-5 py-4 font-bold text-white shadow-sm transition hover:bg-orange-500 active:border-b-2"
+        >
+          <span>⏰ Ôn tập · {review.dueCount} từ đến “Thời gian vàng”</span>
+          <span aria-hidden>→</span>
         </Link>
       )}
 
