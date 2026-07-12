@@ -145,9 +145,11 @@ let days = DAYS;
 if (ONLY_DAY) days = days.filter(([d]) => d === ONLY_DAY);
 else if (LIMIT) days = days.slice(0, LIMIT);
 if (!FORCE && !ONLY_DAY) {
-  const { data: existing } = await db.from("topic_days").select("day_no");
-  const have = new Set((existing ?? []).map((r) => r.day_no));
-  days = days.filter(([d]) => !have.has(d));
+  // Skip only days whose stored row already matches the intended lesson;
+  // regenerate legacy/mismatched rows (presence alone is not "done").
+  const { data: existing } = await db.from("topic_days").select("day_no,lesson_id");
+  const okById = new Map((existing ?? []).map((r) => [r.day_no, r.lesson_id]));
+  days = days.filter(([d, lid]) => okById.get(d) !== lid);
 }
 console.error(`days to generate: ${days.map(([d]) => d).join(", ") || "(none)"}`);
 
