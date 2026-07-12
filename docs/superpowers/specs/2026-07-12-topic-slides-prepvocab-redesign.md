@@ -68,6 +68,9 @@ everyday topic toward real workplace/interview situations.
 
 Each day is an ordered deck played full-screen with a progress bar (existing
 `TopicDeckRunner` chrome). Light mode. Advance by button / arrow keys / progress dots.
+**Animation uses Framer Motion** (new dependency `framer-motion`) — slide-to-slide
+transitions (`AnimatePresence`), staggered card/line reveals, and tap micro-interactions,
+respecting `prefers-reduced-motion`. This is the "xịn" polish layer (no Remotion).
 Slide types (the deck mixes data-driven and AI-generated slides):
 
 | Type | Source | Interaction |
@@ -130,10 +133,46 @@ hydrated), `POST /api/topics/[day]/grade`, `finishTopicDay`; the `/topics` roadm
 - Roadmap shows **20 days** (data-driven from `topic_days`, so no code change needed
   beyond re-seed).
 
+## Topic Review (SRS) — a separate "Ôn tập lộ trình" function
+
+A dedicated spaced-repetition review for the PrepVocab words, reusing the existing
+"Thời gian vàng" SRS engine (`src/lib/srs.ts`) but on its **own schedule**, kept fully
+separate from the course-1 `/review`. Goal: maximize retention via context-rich active
+recall.
+
+- **Enrollment:** when a day is completed (`finishTopicDay`), **all 25 words** of that
+  day's lesson are enrolled into the topic SRS via `scheduleNew` (skip words already
+  enrolled). Comprehensive coverage so nothing is dropped.
+- **Storage:** new table `user_topic_srs(user_id, word_id, proficiency, memory_level,
+  ease, interval_days, due_at, last_reviewed_at, correct_count, wrong_count, status,
+  first_learned_at, primary key(user_id, word_id))` — mirrors `user_word_progress` so
+  `srs.ts`'s `scheduleNew`/`reviewWord` apply unchanged, but isolated from the main
+  review.
+- **Entry point:** a **"Ôn tập"** section on the `/topics` roadmap (and/or its own nav
+  item) showing the **due count** now and the **next golden moment** (reuse the existing
+  golden-moment UI pattern). Route `/topics/review`.
+- **Detailed review session** (`GET` the due words → run a session): for each due word,
+  **recall-before-reveal**:
+  1. **Recall (context):** show the word's `example_en` **with the target word blanked**,
+     plus the real image and `meaning_vi` as hints → learner types the word. (If the word
+     has no example, fall back to image + meaning → type the word.)
+  2. **Reveal + reinforce:** show the full card — image, word, `meaning_vi`, the complete
+     `example_en`, and 🔊 **TTS** (pronounce the word; option to hear the sentence).
+  3. **Grade:** typed-correct → correct, else incorrect; `reviewWord` updates the SRS row
+     and reschedules the next golden moment.
+- **Finish:** award XP + touch streak via the existing activity helpers (a new
+  `finishTopicReview` server action, mirroring `finishReviewSession`).
+- **APIs/actions:** `GET /api/topics/review` (due words, hydrated) or a server-side load
+  in the route page; `submitTopicReview(wordId, correct)` + `finishTopicReview(...)`
+  server actions reusing the `stateToRow`/`rowToState` + `srs.ts` pattern.
+- **Components:** `TopicReviewClient` + a detailed review card, under
+  `src/components/topics/`. Reuses `tts.ts`.
+
 ## Non-goals
 
-Remotion; Gemini/AI image generation; audio recording for words (TTS covers
-pronunciation); changing course 1 / existing learn-review-speaking-writing flows; mobile.
+Remotion (dropped — Framer Motion covers slide polish); Gemini/AI image generation;
+audio recording for words (TTS covers pronunciation); changing course 1 / existing
+learn-review-speaking-writing flows; mobile.
 
 ## Testing
 
