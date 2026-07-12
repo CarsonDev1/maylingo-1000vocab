@@ -34,9 +34,13 @@ export async function GET(_req: Request, { params }: { params: { day: string } }
   const slides = normalizeSlides((row as { slides: unknown }).slides);
   const wordIds = Array.from(
     new Set(
-      slides.flatMap((s) =>
-        s.type === "vocab" ? [s.word_id] : s.type === "attribute" && s.word_id != null ? [s.word_id] : [],
-      ),
+      slides.flatMap((s) => {
+        if (s.type === "vocab") return s.word_ids;
+        if (s.type === "example") return [s.word_id];
+        if (s.type === "attribute" && s.word_id != null) return [s.word_id];
+        if (s.type === "cover" && s.hero_word_id != null) return [s.hero_word_id];
+        return [];
+      }),
     ),
   );
 
