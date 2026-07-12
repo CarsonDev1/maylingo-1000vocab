@@ -86,48 +86,48 @@ async function buildDeck(titleEn, words) {
   const wordList = words.slice(0, 20).map((w) => `${w.term} (${w.meaning_vi ?? ""})`).join(", ");
   const system =
     "You design English communication practice for a Vietnamese software engineer who wants to work and interview at multinational companies. " +
-    "Frame everything around real workplace/interview/daily-professional situations. Reply ONLY with valid JSON.";
+    "Frame everything around real workplace/interview/daily-professional situations. Reply ONLY with valid JSON, entirely in English.";
   const user = `Topic: "${titleEn}". Vocabulary: ${wordList}.
 Return JSON with EXACTLY:
 {
-  "attribute": [ { "word": "<one vocab word or empty>", "prompt_en": "<short factual/usage MC question in English>", "prompt_vi": "<Vietnamese translation>", "options": [ {"label":"<en>","correct":true},{"label":"<en>","correct":false},{"label":"<en>","correct":false},{"label":"<en>","correct":false} ], "explain_vi": "<1 short Vietnamese sentence>" } ],
-  "dialogue": { "title_en": "<short scene title using this topic>", "lines": [ {"who":"a","en":"<line>","vi":"<vi>"}, {"who":"b","en":"<line>","vi":"<vi>"}, {"who":"a","en":"<line>","vi":"<vi>"}, {"who":"b","en":"<line>","vi":"<vi>"} ] },
-  "voice_qa": [ { "question_en": "<situational spoken question a colleague/interviewer asks about this topic>", "question_vi": "<vi>", "key_points": ["<point>","<point>","<point>"], "sample_answer_en": "<2-3 sentence sample answer>" } ]
+  "attribute": [ { "word": "<one vocab word or empty>", "prompt_en": "<short factual/usage MC question in English>", "options": [ {"label":"<en>","correct":true},{"label":"<en>","correct":false},{"label":"<en>","correct":false},{"label":"<en>","correct":false} ], "explain_en": "<1 short English sentence>" } ],
+  "dialogue": { "title_en": "<short scene title using this topic>", "lines": [ {"who":"a","en":"<line>"}, {"who":"b","en":"<line>"}, {"who":"a","en":"<line>"}, {"who":"b","en":"<line>"} ] },
+  "voice_qa": [ { "question_en": "<situational spoken question a colleague/interviewer asks about this topic>", "key_points": ["<point>","<point>","<point>"], "sample_answer_en": "<2-3 sentence sample answer>" } ]
 }
-Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue EXACTLY 4 lines alternating a/b. voice_qa EXACTLY 2 items (2-3 key_points each). Natural, concise.`;
+Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue EXACTLY 4 lines alternating a/b. voice_qa EXACTLY 2 items (2-3 key_points each). Natural, concise. Everything in English only.`;
 
   const parsed = await groq([{ role: "system", content: system }, { role: "user", content: user }], 1800);
   const byTerm = new Map(words.map((w) => [w.term.toLowerCase(), w.id]));
 
   const attribute = (Array.isArray(parsed.attribute) ? parsed.attribute : []).map((a) => {
     const options = normOptions(a.options);
-    const prompt_en = cleanStr(a.prompt_en), prompt_vi = cleanStr(a.prompt_vi);
-    if (!prompt_en || !prompt_vi || options.length < 2 || !options.some((o) => o.correct)) return null;
-    return { type: "attribute", word_id: byTerm.get(cleanStr(a.word)?.toLowerCase() ?? "") ?? null, prompt_en, prompt_vi, options, explain_vi: cleanStr(a.explain_vi) };
+    const prompt_en = cleanStr(a.prompt_en);
+    if (!prompt_en || options.length < 2 || !options.some((o) => o.correct)) return null;
+    return { type: "attribute", word_id: byTerm.get(cleanStr(a.word)?.toLowerCase() ?? "") ?? null, prompt_en, options, explain_en: cleanStr(a.explain_en) };
   }).filter(Boolean).slice(0, 2);
 
   let dialogue = null;
   const dl = parsed.dialogue;
   if (dl && Array.isArray(dl.lines)) {
-    const lines = dl.lines.map((l) => { const en = cleanStr(l.en), vi = cleanStr(l.vi); return en && vi ? { who: l.who === "b" ? "b" : "a", en, vi } : null; }).filter(Boolean).slice(0, 6);
+    const lines = dl.lines.map((l) => { const en = cleanStr(l.en); return en ? { who: l.who === "b" ? "b" : "a", en } : null; }).filter(Boolean).slice(0, 6);
     if (lines.length) dialogue = { type: "dialogue", title_en: cleanStr(dl.title_en) ?? titleEn, lines };
   }
 
   const voice = (Array.isArray(parsed.voice_qa) ? parsed.voice_qa : []).map((v) => {
-    const q = cleanStr(v.question_en), qv = cleanStr(v.question_vi);
-    if (!q || !qv) return null;
-    return { type: "voice_qa", question_en: q, question_vi: qv, key_points: normStrings(v.key_points, 5), sample_answer_en: cleanStr(v.sample_answer_en) };
+    const q = cleanStr(v.question_en);
+    if (!q) return null;
+    return { type: "voice_qa", question_en: q, key_points: normStrings(v.key_points, 5), sample_answer_en: cleanStr(v.sample_answer_en) };
   }).filter(Boolean).slice(0, 2);
 
   if (!attribute.length && !voice.length) throw new Error("empty generation");
 
   const goal = await groq(
-    [{ role: "system", content: "Reply ONLY valid JSON." },
-     { role: "user", content: `One short learning-goal line for the topic "${titleEn}" for a Vietnamese software engineer. JSON: {"goal_en":"...","goal_vi":"..."}` }], 200
+    [{ role: "system", content: "Reply ONLY valid JSON, entirely in English." },
+     { role: "user", content: `One short learning-goal line for the topic "${titleEn}" for a Vietnamese software engineer. JSON: {"goal_en":"..."}` }], 200
   ).catch(() => ({}));
 
   return [
-    { type: "cover", hero_word_id: heroId, goal_en: cleanStr(goal.goal_en), goal_vi: cleanStr(goal.goal_vi) },
+    { type: "cover", hero_word_id: heroId, goal_en: cleanStr(goal.goal_en) },
     ...vocabSlides,
     ...exampleSlides,
     ...attribute,

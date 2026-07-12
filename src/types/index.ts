@@ -153,7 +153,6 @@ export interface CoverTopicSlide {
   type: "cover";
   hero_word_id: number | null;
   goal_en: string | null;
-  goal_vi: string | null;
 }
 export interface VocabTopicSlide {
   type: "vocab";
@@ -167,14 +166,12 @@ export interface AttributeTopicSlide {
   type: "attribute";
   word_id: number | null;
   prompt_en: string;
-  prompt_vi: string;
   options: AttributeOption[];
-  explain_vi: string | null;
+  explain_en: string | null;
 }
 export interface DialogueLine {
   who: "a" | "b";
   en: string;
-  vi: string;
 }
 export interface DialogueTopicSlide {
   type: "dialogue";
@@ -184,7 +181,6 @@ export interface DialogueTopicSlide {
 export interface VoiceQaTopicSlide {
   type: "voice_qa";
   question_en: string;
-  question_vi: string;
   key_points: string[];
   sample_answer_en: string | null;
 }
