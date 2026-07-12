@@ -4,12 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { playAudio } from "@/lib/audio";
 import { finishTopicDay } from "@/lib/actions";
+import { CoverSlide } from "@/components/topics/CoverSlide";
 import { VocabSlide } from "@/components/topics/VocabSlide";
+import { ExampleSlide } from "@/components/topics/ExampleSlide";
 import { AttributeSlide } from "@/components/topics/AttributeSlide";
+import { DialogueSlide } from "@/components/topics/DialogueSlide";
 import { VoiceQASlide } from "@/components/topics/VoiceQASlide";
+import { RecapSlide } from "@/components/topics/RecapSlide";
 import type { TopicDeck, Word } from "@/types";
 
 export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[] }) {
@@ -81,11 +86,26 @@ export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[
       </header>
 
       <div className="flex-1 px-4 pt-6">
-        <div className="mx-auto w-full max-w-xl rounded-2xl bg-white p-6" key={index}>
-          {slide.type === "vocab" && <VocabSlide slide={slide} words={words} onDone={next} />}
-          {slide.type === "attribute" && <AttributeSlide slide={slide} words={words} onDone={next} />}
-          {slide.type === "voice_qa" && <VoiceQASlide slide={slide} dayNo={deck.day_no} onDone={next} />}
-        </div>
+        <MotionConfig reducedMotion="user">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.28 }}
+              className="mx-auto w-full max-w-xl rounded-2xl bg-white p-6"
+            >
+              {slide.type === "cover" && <CoverSlide slide={slide} words={words} title={deck.title_en ?? deck.title_vi ?? ""} onDone={next} />}
+              {slide.type === "vocab" && <VocabSlide slide={slide} words={words} onDone={next} />}
+              {slide.type === "example" && <ExampleSlide slide={slide} words={words} onDone={next} />}
+              {slide.type === "attribute" && <AttributeSlide slide={slide} words={words} onDone={next} />}
+              {slide.type === "dialogue" && <DialogueSlide slide={slide} onDone={next} />}
+              {slide.type === "voice_qa" && <VoiceQASlide slide={slide} dayNo={deck.day_no} onDone={next} />}
+              {slide.type === "recap" && <RecapSlide title={deck.title_en ?? deck.title_vi ?? ""} onDone={next} />}
+            </motion.div>
+          </AnimatePresence>
+        </MotionConfig>
       </div>
     </Overlay>
   );

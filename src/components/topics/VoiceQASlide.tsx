@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { speakText, isTtsSupported } from "@/lib/tts";
 import { useSpeechRecognition } from "@/lib/speech-recognition";
 import { cn } from "@/lib/utils";
-import type { VoiceQaSlide } from "@/types";
+import type { VoiceQaTopicSlide } from "@/types";
 
 interface Grade {
   score: number;
@@ -14,7 +14,7 @@ interface Grade {
   covered: string[];
 }
 
-export function VoiceQASlide({ slide, dayNo, onDone }: { slide: VoiceQaSlide; dayNo: number; onDone: (score: number) => void }) {
+export function VoiceQASlide({ slide, dayNo, onDone }: { slide: VoiceQaTopicSlide; dayNo: number; onDone: (score: number) => void }) {
   const { supported, listening, transcript, start, stop, reset } = useSpeechRecognition({ continuous: true });
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +62,7 @@ export function VoiceQASlide({ slide, dayNo, onDone }: { slide: VoiceQaSlide; da
         </div>
         {slide.key_points.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {slide.key_points.map((k) => {
+            {slide.key_points.map((k: string) => {
               const hit = grade.covered.some((c) => c.toLowerCase() === k.toLowerCase());
               return (
                 <span key={k} className={cn("rounded-full border px-2.5 py-0.5 text-xs font-semibold", hit ? "border-green-300 bg-green-50 text-green-700" : "border-slate-200 bg-white text-slate-400")}>
