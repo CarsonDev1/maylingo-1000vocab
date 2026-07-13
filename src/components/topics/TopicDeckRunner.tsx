@@ -47,13 +47,23 @@ export function TopicDeckRunner({ deck, words, nextDay }: { deck: TopicDeck; wor
       .catch(() => setRewards({ xpEarned: 0, currentStreak: 0, bestScore: 0 }));
   }, [index, total, deck.day_no, scores]);
 
-  // Keyboard nav — ignored while typing in a form field.
+  // Keyboard nav. Arrows always navigate; Enter navigates only when no
+  // interactive control is focused — so typing in the answer box, or pressing
+  // Enter while the mic / a dot / Prev-Next is focused, activates that control
+  // instead of jumping the deck forward.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const el = document.activeElement as HTMLElement | null;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); go(index + 1); }
+      const tag = el?.tagName;
+      if (el && (tag === "INPUT" || tag === "TEXTAREA" || el.isContentEditable)) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); go(index + 1); }
       else if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1); }
+      else if (e.key === "Enter") {
+        const onControl = !!el && (tag === "BUTTON" || tag === "A" || el.getAttribute("role") === "button");
+        if (onControl) return; // let the focused control handle Enter natively
+        e.preventDefault();
+        go(index + 1);
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
