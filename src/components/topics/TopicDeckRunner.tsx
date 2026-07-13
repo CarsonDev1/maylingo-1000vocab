@@ -17,7 +17,7 @@ import { VoiceQASlide } from "@/components/topics/VoiceQASlide";
 import { RecapSlide } from "@/components/topics/RecapSlide";
 import type { TopicDeck, Word } from "@/types";
 
-export function TopicDeckRunner({ deck, words }: { deck: TopicDeck; words: Word[] }) {
+export function TopicDeckRunner({ deck, words, nextDay: _nextDay }: { deck: TopicDeck; words: Word[]; nextDay?: unknown }) {
   const [index, setIndex] = useState(0);
   const [scores, setScores] = useState<number[]>([]);
   const [finished, setFinished] = useState(false);

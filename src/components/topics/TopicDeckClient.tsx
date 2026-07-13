@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { TopicDeckRunner } from "@/components/topics/TopicDeckRunner";
 import type { TopicDeck, Word } from "@/types";
 
+type NextDay = { day_no: number; title_en: string | null } | null;
 type State =
   | { status: "loading" }
   | { status: "error"; message: string }
-  | { status: "ready"; deck: TopicDeck; words: Word[] };
+  | { status: "ready"; deck: TopicDeck; words: Word[]; nextDay: NextDay };
 
 export function TopicDeckClient({ day }: { day: number }) {
   const [state, setState] = useState<State>({ status: "loading" });
@@ -26,7 +27,7 @@ export function TopicDeckClient({ day }: { day: number }) {
       .then((d) => {
         if (cancelled) return;
         if (d._err) setState({ status: "error", message: d._err });
-        else setState({ status: "ready", deck: d.deck as TopicDeck, words: (d.words as Word[]) ?? [] });
+        else setState({ status: "ready", deck: d.deck as TopicDeck, words: (d.words as Word[]) ?? [], nextDay: (d.nextDay as NextDay) ?? null });
       })
       .catch(() => {
         if (!cancelled) setState({ status: "error", message: "Couldn't connect." });
@@ -55,5 +56,5 @@ export function TopicDeckClient({ day }: { day: number }) {
       </div>
     );
   }
-  return <TopicDeckRunner deck={state.deck} words={state.words} />;
+  return <TopicDeckRunner deck={state.deck} words={state.words} nextDay={state.nextDay} />;
 }

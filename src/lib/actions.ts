@@ -206,9 +206,9 @@ export async function confirmDailyGoal(goal: number): Promise<{ ok: true }> {
  * touch the streak. Revalidates sibling paths only — NOT /topics/[day] — so the
  * deck's finish screen is not replaced by a refetch.
  */
-export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{ xpEarned: number }> {
+export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{ xpEarned: number; currentStreak: number; bestScore: number }> {
   const userId = await requireUserId();
-  if (!Number.isInteger(dayNo) || dayNo < 1 || dayNo > 30) return { xpEarned: 0 };
+  if (!Number.isInteger(dayNo) || dayNo < 1 || dayNo > 30) return { xpEarned: 0, currentStreak: 0, bestScore: 0 };
   const db = getSupabaseAdmin();
 
   const clean = scores.filter((s) => Number.isFinite(s)).map((s) => Math.min(100, Math.max(0, Math.round(s))));
@@ -247,10 +247,17 @@ export async function finishTopicDay(dayNo: number, scores: number[]): Promise<{
   await bumpActivity(userId, { xp: xpEarned });
   await touchStreak(userId);
 
+  const { data: streakRow } = await db
+    .from("user_streaks")
+    .select("current_streak")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const currentStreak = (streakRow as { current_streak: number } | null)?.current_streak ?? 0;
+
   revalidatePath("/topics");
   revalidatePath("/topics/review");
   revalidatePath("/dashboard");
-  return { xpEarned };
+  return { xpEarned, currentStreak, bestScore: bestScore ?? 0 };
 }
 
 /** Apply one topic-review answer, updating the separate topic SRS schedule. */

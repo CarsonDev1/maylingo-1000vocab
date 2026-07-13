@@ -51,6 +51,15 @@ export async function GET(_req: Request, { params }: { params: { day: string } }
     words = (data as Word[]) ?? [];
   }
 
+  const { data: nextRow } = await db
+    .from("topic_days")
+    .select("day_no,title_en")
+    .eq("day_no", dayNo + 1)
+    .maybeSingle();
+  const nextDay = nextRow
+    ? { day_no: (nextRow as { day_no: number }).day_no, title_en: (nextRow as { title_en: string | null }).title_en }
+    : null;
+
   return NextResponse.json({
     deck: {
       day_no: (row as { day_no: number }).day_no,
@@ -60,5 +69,6 @@ export async function GET(_req: Request, { params }: { params: { day: string } }
       slides,
     },
     words,
+    nextDay,
   });
 }
