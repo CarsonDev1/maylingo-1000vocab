@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, RotateCw, BookOpen, BarChart3, Trophy, PenLine, Mic, Map } from "lucide-react";
+import { GraduationCap, RotateCw, BookOpen, BarChart3, Trophy, PenLine, Mic, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Mirrors the native app's bottom tabs (mobile/src/app/(tabs)/_layout.tsx).
@@ -11,7 +11,7 @@ const TABS = [
   { label: "Review", href: "/review", Icon: RotateCw, match: ["/review"] },
   { label: "Writing", href: "/writing", Icon: PenLine, match: ["/writing"] },
   { label: "Speaking", href: "/speaking", Icon: Mic, match: ["/speaking"] },
-  { label: "Lộ trình", href: "/topics", Icon: Map, match: ["/topics"] },
+  { label: "Roadmap", href: "/topics", Icon: Globe, match: ["/topics"] },
   { label: "Notebook", href: "/notebook", Icon: BookOpen, match: ["/notebook"] },
   { label: "Achievements", href: "/stats", Icon: BarChart3, match: ["/stats"] },
   { label: "Leaderboard", href: "/leaderboard", Icon: Trophy, match: ["/leaderboard"] },
