@@ -1,133 +1,143 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { X } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { playAudio } from "@/lib/audio";
 import { finishTopicDay } from "@/lib/actions";
+import { isTtsSupported } from "@/lib/tts";
+import { cn } from "@/lib/utils";
 import { CoverSlide } from "@/components/topics/CoverSlide";
+import { WarmUpSlide } from "@/components/topics/WarmUpSlide";
 import { VocabSlide } from "@/components/topics/VocabSlide";
 import { ExampleSlide } from "@/components/topics/ExampleSlide";
 import { AttributeSlide } from "@/components/topics/AttributeSlide";
+import { PhrasesSlide } from "@/components/topics/PhrasesSlide";
 import { DialogueSlide } from "@/components/topics/DialogueSlide";
 import { VoiceQASlide } from "@/components/topics/VoiceQASlide";
 import { RecapSlide } from "@/components/topics/RecapSlide";
 import type { TopicDeck, Word } from "@/types";
 
-export function TopicDeckRunner({ deck, words, nextDay: _nextDay }: { deck: TopicDeck; words: Word[]; nextDay?: unknown }) {
+type NextDay = { day_no: number; title_en: string | null } | null;
+type Rewards = { xpEarned: number; currentStreak: number; bestScore: number };
+
+export function TopicDeckRunner({ deck, words, nextDay }: { deck: TopicDeck; words: Word[]; nextDay: NextDay }) {
+  const total = deck.slides.length;
   const [index, setIndex] = useState(0);
   const [scores, setScores] = useState<number[]>([]);
-  const [finished, setFinished] = useState(false);
-  const [xp, setXp] = useState(0);
+  const [rewards, setRewards] = useState<Rewards | null>(null);
+  const finishedRef = useRef(false);
 
-  const total = deck.slides.length;
+  const go = useCallback((n: number) => {
+    if (isTtsSupported()) window.speechSynthesis.cancel();
+    setIndex(() => Math.max(0, Math.min(total - 1, n)));
+  }, [total]);
 
-  function next(score?: number) {
-    const nextScores = score != null ? [...scores, score] : scores;
-    if (score != null) setScores(nextScores);
-    if (index + 1 >= total) finish(nextScores);
-    else setIndex((i) => i + 1);
-  }
+  const onScore = useCallback((s: number) => setScores((prev) => [...prev, s]), []);
 
-  function finish(finalScores: number[]) {
-    setFinished(true);
+  // Finish once when the last slide (recap) is reached.
+  useEffect(() => {
+    if (total === 0 || index < total - 1 || finishedRef.current) return;
+    finishedRef.current = true;
     playAudio("/finish.mp3");
-    finishTopicDay(deck.day_no, finalScores)
-      .then((r) => setXp(r.xpEarned))
-      .catch(() => {});
-  }
+    finishTopicDay(deck.day_no, scores)
+      .then(setRewards)
+      .catch(() => setRewards({ xpEarned: 0, currentStreak: 0, bestScore: 0 }));
+  }, [index, total, deck.day_no, scores]);
+
+  // Keyboard nav — ignored while typing in a form field.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const el = document.activeElement as HTMLElement | null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+      if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); go(index + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); go(index - 1); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [index, go]);
 
   if (total === 0) {
     return (
-      <Overlay center>
-        <Empty />
-      </Overlay>
-    );
-  }
-
-  if (finished) {
-    return (
-      <Overlay center>
-        <div className="mx-auto w-full max-w-md px-6 text-center">
-          <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
-            <Image src="/finish.svg" width={90} height={90} alt="" className="mx-auto" />
-            <h2 className="mt-4 text-2xl font-bold text-white">Day {deck.day_no} complete!</h2>
-            <p className="mt-1 text-neutral-300">{deck.title_en}</p>
-            <div className="mt-6 rounded-xl border-2 border-orange-400/60 bg-orange-400/10 p-4">
-              <p className="text-2xl font-bold text-orange-400">+{xp}</p>
-              <p className="text-xs font-bold uppercase text-neutral-400">XP</p>
-            </div>
-            <div className="mt-6 flex flex-col gap-2">
-              <Button asChild variant="secondary">
-                <Link href="/topics">Back to path</Link>
-              </Button>
-            </div>
+      <Shell>
+        <div className="grid flex-1 place-items-center">
+          <div className="rounded-2xl border border-white/10 bg-neutral-800 p-8 text-center">
+            <p className="text-white">No content for this day yet.</p>
+            <Button asChild variant="secondary" className="mt-5"><Link href="/topics">Back to path</Link></Button>
           </div>
         </div>
-      </Overlay>
+      </Shell>
     );
   }
 
   const slide = deck.slides[index];
+  const title = deck.title_en ?? "";
+  const slideTypes = deck.slides.map((s) => s.type);
+  const isLast = index >= total - 1;
 
   return (
-    <Overlay>
-      <header className="mx-auto flex w-full max-w-[1140px] items-center gap-3 px-4 pb-2 pt-6 lg:px-10">
-        <Link href="/topics" aria-label="Exit" className="shrink-0 text-neutral-400 transition hover:text-white">
-          <X className="h-7 w-7" />
-        </Link>
-        <div className="relative h-4 flex-1 overflow-hidden rounded-full bg-white/90">
-          <div className="h-full rounded-full bg-green-500 transition-all duration-300" style={{ width: `${(index / total) * 100}%` }} />
-        </div>
-        <span className="shrink-0 text-sm font-bold text-neutral-400">{index + 1}/{total}</span>
+    <Shell>
+      <header className="mx-auto flex w-full max-w-[1080px] items-center gap-3 px-4 pt-5 lg:px-8">
+        <Link href="/topics" aria-label="Exit" className="shrink-0 text-neutral-400 transition hover:text-white"><X className="h-6 w-6" /></Link>
+        <span className="truncate rounded-full bg-green-500/15 px-3 py-1 text-xs font-bold text-green-400">Day {deck.day_no} · {title}</span>
       </header>
 
-      <div className="flex-1 px-4 pt-6">
-        <MotionConfig reducedMotion="user">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.28 }}
-              className="mx-auto w-full max-w-xl rounded-2xl bg-white p-6"
-            >
-              {slide.type === "cover" && <CoverSlide slide={slide} words={words} title={deck.title_en ?? deck.title_vi ?? ""} onDone={next} />}
-              {slide.type === "vocab" && <VocabSlide slide={slide} words={words} onDone={next} />}
-              {slide.type === "example" && <ExampleSlide slide={slide} words={words} onDone={next} />}
-              {slide.type === "attribute" && <AttributeSlide slide={slide} words={words} onDone={next} />}
-              {slide.type === "dialogue" && <DialogueSlide slide={slide} onDone={next} />}
-              {slide.type === "voice_qa" && <VoiceQASlide slide={slide} dayNo={deck.day_no} onDone={next} />}
-              {slide.type === "recap" && <RecapSlide title={deck.title_en ?? deck.title_vi ?? ""} onDone={next} />}
-            </motion.div>
-          </AnimatePresence>
-        </MotionConfig>
+      <div className="mx-auto mt-3 flex w-full max-w-[1080px] items-center gap-3 px-4 lg:px-8">
+        <div className="flex flex-1 gap-1.5">
+          {deck.slides.map((_, idx) => (
+            <button
+              key={idx}
+              aria-label={`Go to slide ${idx + 1}`}
+              onClick={() => go(idx)}
+              className={cn("h-1.5 flex-1 rounded-full transition", idx === index ? "bg-green-500" : idx < index ? "bg-green-500/40" : "bg-white/15")}
+            />
+          ))}
+        </div>
+        <span className="shrink-0 text-xs font-bold tabular-nums text-neutral-400">{index + 1} / {total}</span>
       </div>
-    </Overlay>
+
+      <div className="mx-auto flex w-full max-w-[1080px] flex-1 px-4 py-4 lg:px-8">
+        <div className="relative w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-800 shadow-2xl lg:aspect-[16/9]">
+          <MotionConfig reducedMotion="user">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.28 }}
+                className="flex h-full flex-col overflow-y-auto p-6 sm:p-8 lg:p-10"
+              >
+                {slide.type === "cover" && <CoverSlide slide={slide} words={words} title={title} />}
+                {slide.type === "warm_up" && <WarmUpSlide slide={slide} />}
+                {slide.type === "vocab" && <VocabSlide slide={slide} words={words} />}
+                {slide.type === "example" && <ExampleSlide slide={slide} words={words} />}
+                {slide.type === "attribute" && <AttributeSlide slide={slide} words={words} />}
+                {slide.type === "phrases" && <PhrasesSlide slide={slide} />}
+                {slide.type === "dialogue" && <DialogueSlide slide={slide} />}
+                {slide.type === "voice_qa" && <VoiceQASlide slide={slide} dayNo={deck.day_no} onScore={onScore} />}
+                {slide.type === "recap" && <RecapSlide title={title} slideTypes={slideTypes} scores={scores} rewards={rewards} nextDay={nextDay} />}
+              </motion.div>
+            </AnimatePresence>
+          </MotionConfig>
+        </div>
+      </div>
+
+      <div className="mx-auto flex w-full max-w-[1080px] items-center gap-3 px-4 pb-5 lg:px-8">
+        <Button variant="secondary" onClick={() => go(index - 1)} disabled={index === 0}>← Prev</Button>
+        <span className="flex-1" />
+        {isLast ? (
+          <Button asChild variant="primary"><Link href="/topics">Back to path</Link></Button>
+        ) : (
+          <Button variant="primary" onClick={() => go(index + 1)}>Next →</Button>
+        )}
+      </div>
+    </Shell>
   );
 }
 
-function Overlay({ children, center }: { children: React.ReactNode; center?: boolean }) {
-  return (
-    <div className={"fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-neutral-900 text-white" + (center ? " items-center justify-center" : "")}>
-      {children}
-    </div>
-  );
-}
-
-function Empty() {
-  return (
-    <div className="mx-auto max-w-md px-6 text-center">
-      <div className="rounded-2xl border-2 border-neutral-700 bg-neutral-800 p-8">
-        <h2 className="text-xl font-bold text-white">No content for this day yet</h2>
-        <Button asChild variant="secondary" className="mt-6">
-          <Link href="/topics">Back to path</Link>
-        </Button>
-      </div>
-    </div>
-  );
+function Shell({ children }: { children: React.ReactNode }) {
+  return <div className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-neutral-900 text-white">{children}</div>;
 }
