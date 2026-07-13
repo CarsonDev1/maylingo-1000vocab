@@ -184,14 +184,29 @@ export interface VoiceQaTopicSlide {
   key_points: string[];
   sample_answer_en: string | null;
 }
+export interface WarmUpTopicSlide {
+  type: "warm_up";
+  scenario_en: string;
+  agenda: string[];
+}
+export interface PhraseGroup {
+  heading_en: string;
+  phrases: string[];
+}
+export interface PhrasesTopicSlide {
+  type: "phrases";
+  groups: PhraseGroup[];
+}
 export interface RecapTopicSlide {
   type: "recap";
 }
 export type TopicSlide =
   | CoverTopicSlide
+  | WarmUpTopicSlide
   | VocabTopicSlide
   | ExampleTopicSlide
   | AttributeTopicSlide
+  | PhrasesTopicSlide
   | DialogueTopicSlide
   | VoiceQaTopicSlide
   | RecapTopicSlide;

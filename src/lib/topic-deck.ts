@@ -1,4 +1,4 @@
-import type { AttributeOption, DialogueLine, TopicSlide } from "@/types";
+import type { AttributeOption, DialogueLine, PhraseGroup, TopicSlide } from "@/types";
 
 function cleanString(v: unknown): string | null {
   if (typeof v !== "string") return null;
@@ -31,6 +31,19 @@ function normalizeStrings(input: unknown, max: number): string[] {
   }
   return out;
 }
+function normalizePhraseGroups(input: unknown): PhraseGroup[] {
+  if (!Array.isArray(input)) return [];
+  const out: PhraseGroup[] = [];
+  for (const item of input) {
+    if (!item || typeof item !== "object") continue;
+    const o = item as Record<string, unknown>;
+    const heading_en = cleanString(o.heading_en);
+    const phrases = normalizeStrings(o.phrases, 4);
+    if (heading_en && phrases.length) out.push({ heading_en, phrases });
+    if (out.length === 3) break;
+  }
+  return out;
+}
 function normalizeLines(input: unknown): DialogueLine[] {
   if (!Array.isArray(input)) return [];
   const out: DialogueLine[] = [];
@@ -55,6 +68,16 @@ function normalizeSlide(raw: unknown): TopicSlide | null {
         hero_word_id: typeof o.hero_word_id === "number" ? o.hero_word_id : null,
         goal_en: cleanString(o.goal_en),
       };
+    case "warm_up": {
+      const scenario_en = cleanString(o.scenario_en);
+      const agenda = normalizeStrings(o.agenda, 5);
+      if (!scenario_en && agenda.length === 0) return null;
+      return { type: "warm_up", scenario_en: scenario_en ?? "", agenda };
+    }
+    case "phrases": {
+      const groups = normalizePhraseGroups(o.groups);
+      return groups.length ? { type: "phrases", groups } : null;
+    }
     case "vocab": {
       const word_ids = numberArray(o.word_ids);
       return word_ids.length ? { type: "vocab", word_ids } : null;

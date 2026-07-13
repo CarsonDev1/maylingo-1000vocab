@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import { normalizeSlides, isDayUnlocked } from "@/lib/topic-deck";
 
 describe("normalizeSlides", () => {
@@ -49,5 +49,58 @@ describe("isDayUnlocked", () => {
     expect(isDayUnlocked(1, new Set())).toBe(true);
     expect(isDayUnlocked(5, new Set([4]))).toBe(true);
     expect(isDayUnlocked(5, new Set([3]))).toBe(false);
+  });
+});
+
+describe("normalizeSlides — warm_up", () => {
+  it("keeps a valid warm_up slide", () => {
+    const out = normalizeSlides([
+      { type: "warm_up", scenario_en: "You just joined a new team.", agenda: ["Vocabulary", "Key phrases", "A conversation"] },
+    ]);
+    expect(out).toEqual([
+      { type: "warm_up", scenario_en: "You just joined a new team.", agenda: ["Vocabulary", "Key phrases", "A conversation"] },
+    ]);
+  });
+
+  it("drops non-string agenda items and caps at 5", () => {
+    const out = normalizeSlides([
+      { type: "warm_up", scenario_en: "S", agenda: ["a", 2, "", "b", "c", "d", "e", "f"] },
+    ]);
+    expect(out[0]).toMatchObject({ type: "warm_up", agenda: ["a", "b", "c", "d", "e"] });
+  });
+
+  it("drops a warm_up with neither scenario nor agenda", () => {
+    expect(normalizeSlides([{ type: "warm_up", scenario_en: "  ", agenda: [] }])).toEqual([]);
+  });
+});
+
+describe("normalizeSlides — phrases", () => {
+  it("keeps valid groups and drops empty/garbage ones", () => {
+    const out = normalizeSlides([
+      { type: "phrases", groups: [
+        { heading_en: "Asking for help", phrases: ["I'm looking for…", "Could you help me?"] },
+        { heading_en: "", phrases: ["ignored"] },
+        { heading_en: "No phrases", phrases: [] },
+      ] },
+    ]);
+    expect(out).toEqual([
+      { type: "phrases", groups: [{ heading_en: "Asking for help", phrases: ["I'm looking for…", "Could you help me?"] }] },
+    ]);
+  });
+
+  it("drops a phrases slide with zero valid groups", () => {
+    expect(normalizeSlides([{ type: "phrases", groups: [{ heading_en: "", phrases: [] }] }])).toEqual([]);
+  });
+});
+
+describe("normalizeSlides — ordering & mixed", () => {
+  it("preserves order and drops unknown types", () => {
+    const out = normalizeSlides([
+      { type: "cover", hero_word_id: 1, goal_en: "g" },
+      { type: "warm_up", scenario_en: "s", agenda: ["a"] },
+      { type: "bogus" },
+      { type: "recap" },
+    ]);
+    expect(out.map((s) => s.type)).toEqual(["cover", "warm_up", "recap"]);
   });
 });
