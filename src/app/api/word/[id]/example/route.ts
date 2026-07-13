@@ -15,12 +15,12 @@ async function feedbackFromGroq(term: string, meaningVi: string | null, text: st
   if (!apiKey) throw new Error("no key");
 
   const systemPrompt =
-    "Bạn là giáo viên tiếng Anh thân thiện dạy người Việt. Chỉ trả lời bằng valid JSON.";
-  const userPrompt = `Học sinh viết câu ví dụ cho từ "${term}"${meaningVi ? ` (nghĩa: ${meaningVi})` : ""}:
+    "You are a friendly English teacher for learners. Reply with valid JSON only.";
+  const userPrompt = `A learner wrote an example sentence for the word "${term}"${meaningVi ? ` (meaning: ${meaningVi})` : ""}:
 """
 ${text}
 """
-Nhận xét NGẮN bằng tiếng Việt (2-4 câu): (1) câu đã dùng từ "${term}" đúng nghĩa và tự nhiên chưa — khen nếu tốt; (2) nếu có lỗi ngữ pháp/dùng từ, chỉ ra và gợi ý một câu hay hơn bằng tiếng Anh. Trả về JSON: { "feedback": "<nhận xét tiếng Việt>" }`;
+Give SHORT feedback in English (2-4 sentences): (1) whether the sentence uses "${term}" with the right meaning and naturally — praise if good; (2) if there are grammar/word-use errors, point them out and suggest a better sentence in English. Return JSON: { "feedback": "<feedback in English>" }`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -93,7 +93,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   try {
     feedback = await feedbackFromGroq((word as { term: string }).term, (word as { meaning_vi: string | null }).meaning_vi, text);
   } catch {
-    feedback = "Đã lưu ví dụ của bạn! Tiếp tục luyện tập để dùng từ này thật tự nhiên nhé.";
+    feedback = "Your example has been saved! Keep practicing to use this word naturally.";
   }
 
   const { data: inserted, error } = await db

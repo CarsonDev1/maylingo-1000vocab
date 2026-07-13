@@ -29,7 +29,7 @@ export function WordDeepContent({
   if (!hasContent(detail)) {
     return (
       <div className="rounded-xl border-2 border-dashed p-5 text-center text-sm text-muted-foreground">
-        Đang cập nhật phần hiểu sâu cho từ này…
+        Deep-dive content for this word is coming soon…
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function WordDeepContent({
       {d.usage_contexts.length > 0 && (
         <section>
           <h4 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            Ngữ cảnh người bản xứ hay dùng
+            How native speakers use it
           </h4>
           <ul className="space-y-3">
             {d.usage_contexts.map((c, i) => (
@@ -62,7 +62,7 @@ export function WordDeepContent({
       {d.collocations.length > 0 && (
         <section>
           <h4 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            Cụm từ / idiom hay đi kèm
+            Common phrases / idioms
           </h4>
           <ul className="space-y-2">
             {d.collocations.map((c, i) => (
@@ -77,7 +77,7 @@ export function WordDeepContent({
 
       {d.nuance_vi && (
         <section className="rounded-xl bg-amber-500/10 p-3">
-          <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-amber-700">Sắc thái</h4>
+          <h4 className="mb-1 text-xs font-bold uppercase tracking-wide text-amber-700">Nuance</h4>
           <p className="text-neutral-800">{d.nuance_vi}</p>
         </section>
       )}

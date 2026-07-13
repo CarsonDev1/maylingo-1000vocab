@@ -121,7 +121,6 @@ export default function SpeakingClient({ lessons, wordsByLesson, xpBefore }: Pro
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-bold text-neutral-700">{l.title_en}</p>
-                      <p className="truncate text-xs text-muted-foreground">{l.title_vi}</p>
                       <div className="mt-1.5 flex items-center gap-2">
                         <div className="flex-1">
                           <LevelProgressBar value={pct} fillClassName="from-emerald-400 to-green-500" glow="#22c55e" height={7} />
@@ -154,20 +153,19 @@ export default function SpeakingClient({ lessons, wordsByLesson, xpBefore }: Pro
           </button>
           <div className="min-w-0 text-right">
             <h2 className="truncate font-bold text-neutral-700">{selectedLesson.title_en}</h2>
-            <p className="truncate text-xs text-muted-foreground">{selectedLesson.title_vi}</p>
           </div>
         </div>
 
         <div className="rounded-2xl border-2 border-blue-100 bg-blue-50 px-4 py-3">
           <p className="text-sm font-semibold text-blue-700">
-            Nói tối thiểu 20 từ về <span className="font-extrabold">{selectedLesson.title_en}</span>, dùng từ vựng đã học.
-            Bấm mic và nói tự nhiên.
+            Speak at least 20 words about <span className="font-extrabold">{selectedLesson.title_en}</span> using the vocabulary you&apos;ve learned.
+            Tap the mic and speak naturally.
           </p>
         </div>
 
         {!supported ? (
           <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-muted-foreground">
-            Trình duyệt chưa hỗ trợ nhận diện giọng nói — hãy dùng Chrome để luyện nói. (Bạn vẫn có thể gõ bên dưới.)
+            Your browser doesn&apos;t support speech recognition — please use Chrome to practice speaking. (You can still type below.)
           </div>
         ) : (
           <div className="flex justify-center">
@@ -185,14 +183,14 @@ export default function SpeakingClient({ lessons, wordsByLesson, xpBefore }: Pro
 
         <textarea
           className="min-h-[150px] w-full resize-none rounded-2xl border-2 border-slate-200 bg-white p-4 text-sm text-neutral-800 placeholder:text-slate-400 transition focus:border-green-400 focus:outline-none"
-          placeholder="Bản chép lời nói của bạn sẽ hiện ở đây — bạn có thể chỉnh sửa trước khi gửi..."
+          placeholder="Your speech transcript will appear here — you can edit it before submitting..."
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isSubmitting}
         />
         <div className="px-1">
           <span className={`text-xs font-semibold ${countColor}`}>
-            {wordCount} words {wordCount < 20 && wordCount > 0 && <span className="ml-1 font-normal text-orange-400">(tối thiểu 20)</span>}
+            {wordCount} words {wordCount < 20 && wordCount > 0 && <span className="ml-1 font-normal text-orange-400">(minimum 20)</span>}
           </span>
         </div>
 

@@ -12,10 +12,10 @@ export interface ExampleValidation {
 export function validateExampleText(text: string): ExampleValidation {
   const words = text.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  if (wordCount === 0) return { ok: false, wordCount, error: "Hãy viết một câu ví dụ." };
+  if (wordCount === 0) return { ok: false, wordCount, error: "Please write an example sentence." };
   if (wordCount < MIN_WORDS)
-    return { ok: false, wordCount, error: `Câu quá ngắn (tối thiểu ${MIN_WORDS} từ).` };
+    return { ok: false, wordCount, error: `Sentence too short (minimum ${MIN_WORDS} words).` };
   if (wordCount > MAX_WORDS)
-    return { ok: false, wordCount, error: `Câu quá dài (tối đa ${MAX_WORDS} từ).` };
+    return { ok: false, wordCount, error: `Sentence too long (maximum ${MAX_WORDS} words).` };
   return { ok: true, wordCount, error: null };
 }

@@ -73,7 +73,7 @@ export function PronunciationTrainer({
   if (!supported) {
     return (
       <div className="rounded-xl border-2 border-dashed p-3 text-center text-sm text-muted-foreground">
-        Trình duyệt chưa hỗ trợ nhận diện giọng nói — hãy dùng Chrome để luyện phát âm.
+        Your browser doesn&apos;t support speech recognition — please use Chrome to practice pronunciation.
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function PronunciationTrainer({
   return (
     <div className="rounded-xl border-2 bg-slate-50 p-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-neutral-700">Đọc to từ này 5 lần</p>
+        <p className="text-sm font-medium text-neutral-700">Say this word aloud 5 times</p>
         <div className="flex items-center gap-1">
           {Array.from({ length: REP_GOAL }, (_, i) => (
             <span
@@ -124,12 +124,12 @@ export function PronunciationTrainer({
         >
           {result.matched ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
           <span>
-            Nghe được: “{result.heard || "…"}” · {Math.round(result.score * 100)}%
+            Heard: “{result.heard || "…"}” · {Math.round(result.score * 100)}%
           </span>
         </div>
       )}
 
-      {done && <p className="mt-2 text-center text-sm font-bold text-green-600">Tuyệt! Bạn đã đọc đủ 5 lần 🎉</p>}
+      {done && <p className="mt-2 text-center text-sm font-bold text-green-600">Great! You&apos;ve said it 5 times 🎉</p>}
     </div>
   );
 }

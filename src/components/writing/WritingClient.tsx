@@ -119,7 +119,6 @@ export default function WritingClient({ lessons, wordsByLesson, xpBefore }: Prop
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-bold text-neutral-700">{l.title_en}</p>
-                      <p className="truncate text-xs text-muted-foreground">{l.title_vi}</p>
                       <div className="mt-1.5 flex items-center gap-2">
                         <div className="flex-1">
                           <LevelProgressBar value={pct} fillClassName="from-emerald-400 to-green-500" glow="#22c55e" height={7} />
@@ -164,7 +163,6 @@ export default function WritingClient({ lessons, wordsByLesson, xpBefore }: Prop
           </button>
           <div className="min-w-0 text-right">
             <h2 className="truncate font-bold text-neutral-700">{selectedLesson.title_en}</h2>
-            <p className="truncate text-xs text-muted-foreground">{selectedLesson.title_vi}</p>
           </div>
         </div>
 

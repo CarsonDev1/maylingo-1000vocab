@@ -21,23 +21,23 @@ async function gradeWithGroq(
 
   const wordList = vocabWords.slice(0, 30).join(", ");
 
-  const systemPrompt = `Bạn là một giáo viên tiếng Anh đạt IELTS 8.5, có nhiều năm kinh nghiệm dạy từ vựng và kỹ năng viết cho học sinh Việt Nam. Nhiệm vụ của bạn là giúp học sinh dùng từ vựng ĐÚNG NGHĨA và ĐÚNG NGỮ CẢNH — không phải soi lỗi chính tả hay dấu câu. Hãy trả lời ONLY bằng valid JSON.`;
+  const systemPrompt = `You are an English teacher with an IELTS 8.5 level and years of experience teaching vocabulary and writing skills to learners. Your job is to help the learner use vocabulary with the RIGHT MEANING and in the RIGHT CONTEXT — not to nitpick spelling or punctuation. Reply with ONLY valid JSON.`;
 
-  const userPrompt = `Một học sinh người Việt đang học từ vựng tiếng Anh đã viết đoạn văn sau về chủ đề "${lessonTitle}":
+  const userPrompt = `An English learner wrote the following paragraph on the topic "${lessonTitle}":
 
 """
 ${text}
 """
 
-Danh sách từ vựng của chủ đề này mà học sinh đã học: ${wordList}
+Vocabulary from this topic that the learner has studied: ${wordList}
 
-Hãy chấm bài và trả về JSON với đúng các trường sau:
+Grade the writing and return JSON with exactly these fields:
 
 {
-  "grammar_score": <số nguyên 0-100 đánh giá tổng thể: độ chính xác từ vựng, cấu trúc câu, mạch ý. KHÔNG trừ điểm vì lỗi viết hoa hay dấu câu nhỏ. 90-100: xuất sắc. 75-89: tốt. 60-74: khá. Dưới 60: cần cải thiện nhiều>,
-  "words_used": <mảng các từ trong danh sách từ vựng xuất hiện trong bài viết (không phân biệt hoa thường, "break time" = "breaktime" = "break-time")>,
-  "feedback": <nhận xét bằng tiếng Việt, dài 5-7 câu, TẬP TRUNG VÀO: (1) Những từ vựng nào học sinh dùng ĐÚNG ngữ cảnh và tự nhiên — chỉ rõ từ đó, khen cụ thể. (2) Những từ vựng nào dùng CHƯA ĐỦ TỰ NHIÊN hoặc sai ngữ cảnh — ví dụ: dùng được nhưng có từ hay hơn, hoặc dùng sai vị trí trong câu. (3) Gợi ý 1-2 từ/cụm từ hay hơn để thay thế hoặc bổ sung cho bài viết thêm phong phú. (4) Nhận xét ngắn về mạch ý và sự liên kết câu. (5) Động viên và định hướng cải thiện>,
-  "grammar_notes": <chỉ ghi các lỗi về CẤU TRÚC CÂU, THỜI ĐỘNG TỪ, hoặc DÙNG SAI TỪ LOẠI (noun/verb/adj) — KHÔNG đề cập lỗi viết hoa, dấu phẩy, dấu chấm. Mỗi lỗi theo định dạng: "❌ [phần câu sai] → ✅ [sửa lại]: [giải thích ngắn tại sao]". Liệt kê 2-3 lỗi nếu có, hoặc để "" nếu câu đúng hết>
+  "grammar_score": <integer 0-100 overall: vocabulary accuracy, sentence structure, coherence. Do NOT deduct for capitalization or minor punctuation. 90-100: excellent. 75-89: good. 60-74: fair. Below 60: needs a lot of improvement>,
+  "words_used": <array of the vocabulary words from the list that appear in the writing (case-insensitive, "break time" = "breaktime" = "break-time")>,
+  "feedback": <feedback in English, 5-7 sentences, FOCUS ON: (1) Which vocabulary words the learner used correctly and naturally — name them and praise specifically. (2) Which words were used unnaturally or in the wrong context — e.g. usable but there is a better word, or wrong placement in the sentence. (3) Suggest 1-2 better words/phrases to replace or enrich the writing. (4) A short note on coherence and how the sentences connect. (5) Encouragement and direction to improve>,
+  "grammar_notes": <only note errors in SENTENCE STRUCTURE, VERB TENSE, or WRONG PART OF SPEECH (noun/verb/adj) — do NOT mention capitalization, commas, or periods. Format each error as: "❌ [wrong part] → ✅ [fix]: [short reason why]". List 2-3 errors if any, or "" if the writing is correct>
 }`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -123,7 +123,7 @@ export async function POST(req: Request) {
     grading = {
       grammar_score: 70,
       words_used: wordsUsed,
-      feedback: "Bài viết của bạn đã được ghi nhận! Hãy tiếp tục luyện tập để cải thiện kỹ năng viết.",
+      feedback: "Your writing has been saved! Keep practicing to improve your writing skills.",
       grammar_notes: "",
     };
   }
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
   // Sanitize grading output
   const grammarScore = Math.min(100, Math.max(0, Math.round(Number(grading.grammar_score) || 70)));
   const wordsUsed: string[] = Array.isArray(grading.words_used) ? grading.words_used.filter((w) => typeof w === "string") : [];
-  const feedback = typeof grading.feedback === "string" ? grading.feedback : "Cố gắng tốt lắm! Hãy tiếp tục luyện viết nhé.";
+  const feedback = typeof grading.feedback === "string" ? grading.feedback : "Great effort! Keep practicing your writing.";
   const grammarNotes = typeof grading.grammar_notes === "string" ? grading.grammar_notes : "";
 
   // XP: 20 base + 5 per vocab word used (capped at 8 words = 40 bonus), max 60 XP

@@ -26,8 +26,8 @@ const PROMPT: Record<string, string> = {
   listen_write: "Listen and type the word",
   spell: "Spell the word",
   flashcard: "New word",
-  pronounce: "Đọc to từ này",
-  write_example: "Tự đặt câu với từ này",
+  pronounce: "Say this word aloud",
+  write_example: "Write your own sentence",
 };
 
 function escapeRe(s: string) {
@@ -220,7 +220,7 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
 
         <div className="w-full rounded-2xl bg-white p-4 text-left text-neutral-800">
           <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-green-600">
-            <BookOpen className="h-4 w-4" /> Hiểu sâu
+            <BookOpen className="h-4 w-4" /> Deep dive
           </div>
           {detail === "loading" ? (
             <WordDeepContentSkeleton />
@@ -260,10 +260,10 @@ export function ExerciseView({ step, onNext, index, total }: ExerciseViewProps) 
           <PersonalExamples wordId={word.id} term={word.term} />
           <div className="flex gap-3">
             <Button variant="ghost" className="flex-1" onClick={() => onNext(null)}>
-              Bỏ qua
+              Skip
             </Button>
             <Button variant="primary" className="flex-1" onClick={() => onNext(null)}>
-              Xong
+              Done
             </Button>
           </div>
         </div>
@@ -433,7 +433,7 @@ function PronounceStep({ word, onDone }: { word: Word; onDone: () => void }) {
       <PronunciationTrainer term={word.term} audioUrl={word.audio_url} onComplete={() => setReachedGoal(true)} />
       <div className="flex gap-3">
         <Button variant="ghost" className="flex-1" onClick={onDone}>
-          Bỏ qua
+          Skip
         </Button>
         <Button
           variant="primary"
@@ -441,12 +441,12 @@ function PronounceStep({ word, onDone }: { word: Word; onDone: () => void }) {
           disabled={!reachedGoal}
           onClick={onDone}
         >
-          Tiếp tục
+          Continue
         </Button>
       </div>
       {!reachedGoal && (
         <p className="text-center text-xs text-muted-foreground">
-          Đọc đủ 5 lần để mở nút Tiếp tục, hoặc bấm Bỏ qua.
+          Say it 5 times to unlock Continue, or tap Skip.
         </p>
       )}
     </div>

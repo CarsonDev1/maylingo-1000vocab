@@ -73,7 +73,7 @@ export default async function LessonsPage() {
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate text-lg font-bold text-neutral-700">{l.title_en}</h3>
                       <p className="truncate text-sm text-muted-foreground">
-                        {l.sort}. {l.title_vi}
+                        Topic {l.sort}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex-1">

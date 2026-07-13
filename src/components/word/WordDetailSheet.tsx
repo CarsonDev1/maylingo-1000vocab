@@ -96,7 +96,7 @@ export function WordDetailSheet({
 
               {/* Hiểu sâu */}
               <div className="mt-5 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-green-600">
-                <BookOpen className="h-4 w-4" /> Hiểu sâu
+                <BookOpen className="h-4 w-4" /> Deep dive
               </div>
 
               <div className="mt-3">

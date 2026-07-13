@@ -16,21 +16,21 @@ async function gradeWithGroq(text: string, lessonTitle: string, vocabWords: stri
   if (!apiKey) throw new Error("GROQ_API_KEY not configured");
 
   const wordList = vocabWords.slice(0, 30).join(", ");
-  const systemPrompt = `Bạn là giáo viên tiếng Anh giao tiếp đạt IELTS Speaking 8.0, chuyên dạy học sinh Việt Nam luyện NÓI. Đây là BẢN CHÉP LỜI NÓI (speech-to-text) nên có thể thiếu dấu câu — ĐỪNG soi lỗi dấu câu hay viết hoa. Tập trung vào việc dùng từ đúng ngữ cảnh, độ tự nhiên và trôi chảy. Trả lời ONLY bằng valid JSON.`;
-  const userPrompt = `Một học sinh người Việt đã NÓI (được chép lại) về chủ đề "${lessonTitle}":
+  const systemPrompt = `You are a communicative English teacher with an IELTS Speaking 8.0 level who coaches learners on SPEAKING. This is a SPEECH-TO-TEXT TRANSCRIPT, so it may lack punctuation — do NOT nitpick punctuation or capitalization. Focus on using words in the right context, naturalness, and fluency. Reply with ONLY valid JSON.`;
+  const userPrompt = `An English learner SPOKE (transcribed below) about the topic "${lessonTitle}":
 
 """
 ${text}
 """
 
-Danh sách từ vựng của chủ đề: ${wordList}
+Vocabulary for this topic: ${wordList}
 
-Trả về JSON:
+Return JSON:
 {
-  "fluency_score": <số nguyên 0-100: độ trôi chảy, tự nhiên, dùng từ đúng ngữ cảnh. Không trừ điểm vì dấu câu/viết hoa>,
-  "words_used": <mảng các từ trong danh sách xuất hiện trong bài nói (không phân biệt hoa thường)>,
-  "feedback": <nhận xét TIẾNG VIỆT 4-6 câu: (1) khen từ dùng tốt/tự nhiên; (2) chỗ diễn đạt chưa tự nhiên và cách nói hay hơn; (3) 1-2 mẫu câu/cụm nên dùng khi nói về chủ đề này; (4) động viên>,
-  "grammar_notes": <2-3 lỗi cấu trúc/thì/từ loại theo mẫu "❌ ... → ✅ ...: giải thích", hoặc "" nếu ổn>
+  "fluency_score": <integer 0-100: fluency, naturalness, using words in the right context. Do not deduct for punctuation/capitalization>,
+  "words_used": <array of the words from the list that appear in the spoken response (case-insensitive)>,
+  "feedback": <feedback in ENGLISH, 4-6 sentences: (1) praise words used well/naturally; (2) point out phrasing that sounds unnatural and a better way to say it; (3) 1-2 sample sentences/phrases to use when speaking about this topic; (4) encouragement>,
+  "grammar_notes": <2-3 structure/tense/part-of-speech errors in the format "❌ ... → ✅ ...: explanation", or "" if fine>
 }`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -103,14 +103,14 @@ export async function POST(req: Request) {
     grading = {
       fluency_score: 70,
       words_used: vocabWords.filter((w) => textNorm.includes(norm(w))),
-      feedback: "Đã ghi nhận phần nói của bạn! Cứ luyện nói đều đặn để trôi chảy hơn nhé.",
+      feedback: "Your speaking has been saved! Keep practicing regularly to become more fluent.",
       grammar_notes: "",
     };
   }
 
   const fluencyScore = Math.min(100, Math.max(0, Math.round(Number(grading.fluency_score) || 70)));
   const wordsUsed: string[] = Array.isArray(grading.words_used) ? grading.words_used.filter((w) => typeof w === "string") : [];
-  const feedback = typeof grading.feedback === "string" ? grading.feedback : "Cố gắng tốt lắm! Tiếp tục luyện nói nhé.";
+  const feedback = typeof grading.feedback === "string" ? grading.feedback : "Great effort! Keep practicing your speaking.";
   const grammarNotes = typeof grading.grammar_notes === "string" ? grading.grammar_notes : "";
 
   const xpEarned = 20 + Math.min(wordsUsed.length * 5, 40);
