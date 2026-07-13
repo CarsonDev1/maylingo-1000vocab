@@ -49,6 +49,19 @@ function normStrings(input, max) {
   for (const it of input) { const s = cleanStr(it); if (s) out.push(s); if (out.length === max) break; }
   return out;
 }
+function normAgenda(v) { return normStrings(v, 5); }
+function normPhraseGroups(v) {
+  if (!Array.isArray(v)) return [];
+  const out = [];
+  for (const it of v) {
+    if (!it || typeof it !== "object") continue;
+    const heading_en = cleanStr(it.heading_en);
+    const phrases = normStrings(it.phrases, 4);
+    if (heading_en && phrases.length) out.push({ heading_en, phrases });
+    if (out.length === 3) break;
+  }
+  return out;
+}
 
 async function groq(messages, maxTokens) {
   const payload = JSON.stringify({ model: GROQ_MODEL, messages, response_format: { type: "json_object" }, temperature: 0.6, max_tokens: maxTokens });
@@ -92,11 +105,13 @@ Return JSON with EXACTLY:
 {
   "attribute": [ { "word": "<one vocab word or empty>", "prompt_en": "<short factual/usage MC question in English>", "options": [ {"label":"<en>","correct":true},{"label":"<en>","correct":false},{"label":"<en>","correct":false},{"label":"<en>","correct":false} ], "explain_en": "<1 short English sentence>" } ],
   "dialogue": { "title_en": "<short scene title using this topic>", "lines": [ {"who":"a","en":"<line>"}, {"who":"b","en":"<line>"}, {"who":"a","en":"<line>"}, {"who":"b","en":"<line>"} ] },
-  "voice_qa": [ { "question_en": "<situational spoken question a colleague/interviewer asks about this topic>", "key_points": ["<point>","<point>","<point>"], "sample_answer_en": "<2-3 sentence sample answer>" } ]
+  "voice_qa": [ { "question_en": "<situational spoken question a colleague/interviewer asks about this topic>", "key_points": ["<point>","<point>","<point>"], "sample_answer_en": "<2-3 sentence sample answer>" } ],
+  "warm_up": { "scenario_en": "<1-2 sentence real workplace/daily situation that frames this topic>", "agenda": ["<lesson step>","<lesson step>","<lesson step>","<lesson step>"] },
+  "phrases": [ { "heading_en": "<a situation>", "phrases": ["<english sentence>","<english sentence>"] }, { "heading_en": "<another situation>", "phrases": ["<english sentence>","<english sentence>"] } ]
 }
-Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue EXACTLY 4 lines alternating a/b. voice_qa EXACTLY 2 items (2-3 key_points each). Natural, concise. Everything in English only.`;
+Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue EXACTLY 4 lines alternating a/b. voice_qa EXACTLY 2 items (2-3 key_points each). warm_up.agenda 3-4 short items. phrases EXACTLY 2 groups, each 2-3 English phrases grounded in this topic. Natural, concise. Everything in English only.`;
 
-  const parsed = await groq([{ role: "system", content: system }, { role: "user", content: user }], 1800);
+  const parsed = await groq([{ role: "system", content: system }, { role: "user", content: user }], 2400);
   const byTerm = new Map(words.map((w) => [w.term.toLowerCase(), w.id]));
 
   const attribute = (Array.isArray(parsed.attribute) ? parsed.attribute : []).map((a) => {
@@ -119,6 +134,16 @@ Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue
     return { type: "voice_qa", question_en: q, key_points: normStrings(v.key_points, 5), sample_answer_en: cleanStr(v.sample_answer_en) };
   }).filter(Boolean).slice(0, 2);
 
+  let warmUp = null;
+  const wu = parsed.warm_up;
+  if (wu && typeof wu === "object") {
+    const scenario_en = cleanStr(wu.scenario_en);
+    const agenda = normAgenda(wu.agenda);
+    if (scenario_en || agenda.length) warmUp = { type: "warm_up", scenario_en: scenario_en ?? "", agenda };
+  }
+  const phraseGroups = normPhraseGroups(parsed.phrases);
+  const phrasesSlide = phraseGroups.length ? { type: "phrases", groups: phraseGroups } : null;
+
   if (!attribute.length && !voice.length) throw new Error("empty generation");
 
   const goal = await groq(
@@ -128,9 +153,11 @@ Rules: attribute EXACTLY 2 items (4 options each, exactly one correct). dialogue
 
   return [
     { type: "cover", hero_word_id: heroId, goal_en: cleanStr(goal.goal_en) },
+    ...(warmUp ? [warmUp] : []),
     ...vocabSlides,
     ...exampleSlides,
     ...attribute,
+    ...(phrasesSlide ? [phrasesSlide] : []),
     ...(dialogue ? [dialogue] : []),
     ...voice,
     { type: "recap" },
