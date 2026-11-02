@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { requireUserId } from "@/lib/auth";
-import { getLessonById, getNewWordsForLesson, getDistractorPool, getTotalXp } from "@/lib/queries";
+import { getLessonById, getLessonsWithStats, getNewWordsForLesson, getDistractorPool, getTotalXp } from "@/lib/queries";
+import { unlockedFlags } from "@/lib/lesson-lock";
 import { LearnClient } from "@/components/session/LearnClient";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +11,13 @@ export default async function LearnLessonPage({ params }: { params: { lessonId: 
   const lessonId = Number(params.lessonId);
   const lesson = await getLessonById(lessonId);
   if (!lesson) return <Notice title="Lesson not found" />;
+
+  // Server-side guard so locked topics can't be opened by URL.
+  const lessons = await getLessonsWithStats(userId);
+  const idx = lessons.findIndex((l) => l.id === lessonId);
+  if (idx >= 0 && !unlockedFlags(lessons)[idx]) {
+    return <Notice title="Topic locked" desc="Finish the previous topic to unlock this one." />;
+  }
 
   const [words, pool, xpBefore] = await Promise.all([
     getNewWordsForLesson(userId, lessonId),

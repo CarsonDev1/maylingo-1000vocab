@@ -6,13 +6,16 @@ import FeedWrapper from "@/components/feed-wrapper";
 import StickyWrapper from "@/components/sticky-wrapper";
 import UserProgress from "@/components/user-progress";
 import { PageHeader } from "@/components/page-header";
-import { CheckCircle2, ChevronRight, Repeat } from "lucide-react";
+import { CheckCircle2, ChevronRight, Lock, Repeat } from "lucide-react";
+import { unlockedFlags } from "@/lib/lesson-lock";
 import { LevelProgressBar } from "@/components/level/LevelProgressBar";
 import type { GamificationStats } from "@/lib/badges";
 
 export default async function LessonsPage() {
   const userId = await requireUserId();
   const [lessons, dash] = await Promise.all([getLessonsWithStats(userId), getDashboardData(userId)]);
+
+  const unlocked = unlockedFlags(lessons);
 
   const stats: GamificationStats = {
     totalXp: dash.totalXp,
@@ -38,19 +41,22 @@ export default async function LessonsPage() {
           </div>
         ) : (
           <ul className="flex flex-col gap-y-3">
-            {lessons.map((l) => {
+            {lessons.map((l, i) => {
               const pct = l.total_words ? Math.round((l.learned_words / l.total_words) * 100) : 0;
               const started = l.learned_words > 0;
               const done = l.total_words > 0 && l.learned_words >= l.total_words;
+              const locked = !unlocked[i];
               return (
                 <li key={l.id}>
-                  <Link
-                    href={`/learn/${l.id}`}
+                  <Row
+                    href={locked ? null : `/learn/${l.id}`}
                     className={[
                       "group flex items-center gap-4 rounded-2xl border-2 border-b-4 p-3 transition active:border-b-2",
-                      done
-                        ? "border-green-300 bg-green-50 hover:bg-green-100"
-                        : "border-slate-200 bg-white hover:bg-slate-50",
+                      locked
+                        ? "cursor-not-allowed border-slate-200 bg-slate-100 opacity-60 active:border-b-4"
+                        : done
+                          ? "border-green-300 bg-green-50 hover:bg-green-100"
+                          : "border-slate-200 bg-white hover:bg-slate-50",
                     ].join(" ")}
                   >
                     {/* representative image */}
@@ -92,7 +98,9 @@ export default async function LessonsPage() {
 
                     {/* right state */}
                     <div className="flex w-10 shrink-0 items-center justify-center">
-                      {done ? (
+                      {locked ? (
+                        <Lock className="h-6 w-6 text-slate-400" />
+                      ) : done ? (
                         <CheckCircle2 className="h-7 w-7 text-green-500" />
                       ) : l.due_words > 0 ? (
                         <span className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-1 text-xs font-bold text-orange-600">
@@ -103,13 +111,29 @@ export default async function LessonsPage() {
                         <ChevronRight className="h-6 w-6 text-slate-300 transition group-hover:text-green-500" />
                       )}
                     </div>
-                  </Link>
+                  </Row>
                 </li>
               );
             })}
           </ul>
         )}
       </FeedWrapper>
+    </div>
+  );
+}
+
+/** Link when `href` is set; inert div (locked topic) otherwise. */
+function Row({ href, className, children }: { href: string | null; className: string; children: React.ReactNode }) {
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <div aria-disabled title="Finish the previous topic to unlock" className={className}>
+      {children}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import React from "react";
 
 export function PageHeader({ title, back }: { title: string; back?: string }) {
   return (
-    <div className="sticky top-0 bg-white pb-3 lg:pt-[28px] lg:mt-[-28px] flex items-center justify-between border-b-2 mb-5 text-neutral-400 lg:z-50">
+    <div className="sticky top-0 bg-white pb-3 pt-6 mt-[-24px] lg:pt-[28px] lg:mt-[-28px] flex items-center justify-between border-b-2 mb-5 text-neutral-400 z-50">
       {back ? (
         <Link href={back}>
           <Button variant="ghost" size="sm">
