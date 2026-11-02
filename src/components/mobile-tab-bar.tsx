@@ -11,8 +11,8 @@ const TABS = [
   { label: "Review", href: "/review", Icon: RotateCw, match: ["/review"] },
   { label: "Writing", href: "/writing", Icon: PenLine, match: ["/writing"] },
   { label: "Notebook", href: "/notebook", Icon: BookOpen, match: ["/notebook"] },
-  { label: "Achievements", href: "/stats", Icon: BarChart3, match: ["/stats"] },
-  { label: "Leaderboard", href: "/leaderboard", Icon: Trophy, match: ["/leaderboard"] },
+  { label: "Stats", href: "/stats", Icon: BarChart3, match: ["/stats"] },
+  { label: "Ranking", href: "/leaderboard", Icon: Trophy, match: ["/leaderboard"] },
 ];
 
 /** Bottom tab bar for mobile — replaces the sidebar/hamburger so the web matches the app. Hidden on lg+. */
@@ -30,12 +30,12 @@ export default function MobileTabBar() {
             key={href}
             href={href}
             className={cn(
-              "flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-bold transition-colors",
+              "flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 text-[10px] font-bold transition-colors",
               active ? "text-green-600" : "text-slate-400",
             )}
           >
             <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
-            <span>{label}</span>
+            <span className="max-w-full truncate">{label}</span>
           </Link>
         );
       })}

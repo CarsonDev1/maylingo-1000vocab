@@ -149,13 +149,13 @@ export function StatsClient({ data }: { data: StatsData }) {
           <CardTitle className="text-base">Memory level</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-5 gap-2 text-center">
+          <div className="grid grid-cols-5 gap-1.5 text-center sm:gap-2">
             {LEVEL_LABELS.slice(1).map((label, i) => (
-              <div key={label} className="rounded-xl border-2 p-3">
-                <div className="text-2xl font-extrabold" style={{ color: LEVEL_COLORS[i + 1] }}>
+              <div key={label} className="min-w-0 rounded-xl border-2 px-1 py-3 sm:px-3">
+                <div className="text-xl font-extrabold sm:text-2xl" style={{ color: LEVEL_COLORS[i + 1] }}>
                   {data.levels[i + 1]}
                 </div>
-                <div className="text-xs text-muted-foreground">{label}</div>
+                <div className="truncate text-[11px] text-muted-foreground sm:text-xs">{label}</div>
               </div>
             ))}
           </div>
